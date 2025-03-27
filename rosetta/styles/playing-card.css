@@ -1,0 +1,161 @@
+.card-rack {
+    perspective: 1200px;
+    transform-style: preserve-3d;
+    position: relative;
+    isolation: isolate;
+    z-index: 0;
+}
+
+.playing-card {
+    --card-width: 200px;
+    --card-height: 300px;
+    width: var(--card-width);
+    height: var(--card-height);
+    flex-shrink: 0;
+    /* Prevent card from shrinking */
+    position: relative;
+    overflow: hidden;
+    border-radius: 5% / 3.5%;
+    background-color: #040712;
+    background-image: var(--card-bg, url('/assets/default.png'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform-style: preserve-3d;
+    transform-origin: center;
+    touch-action: none;
+    z-index: 1;
+    isolation: isolate;
+    margin: 10px;
+
+    box-shadow:
+        -7px -7px 10px -5px transparent,
+        7px 7px 10px -5px transparent,
+        0 0 5px 0px rgba(255, 255, 255, 0),
+        0 55px 35px -20px rgba(0, 0, 0, 0.3);
+
+    /* Add these properties */
+    transform: translateZ(0);
+    transition: transform 0.3s ease;
+    will-change: transform;
+    backface-visibility: hidden;
+}
+
+.playing-card:hover {
+    box-shadow:
+        0 0 13px 4px rgba(255, 255, 255, 0.1),
+        0 55px 35px -20px rgba(0, 0, 0, 0.3);
+    transform: translateZ(20px);
+    z-index: 2;
+}
+
+.playing-card:before,
+.playing-card:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-repeat: no-repeat;
+    opacity: .5;
+    mix-blend-mode: color-dodge;
+    transition: all .33s ease;
+}
+
+.playing-card:before {
+    background-position: 50% 50%;
+    background-size: 300% 300%;
+    background-image: linear-gradient(115deg,
+            transparent 0%,
+            var(--color1) 25%,
+            transparent 47%,
+            transparent 53%,
+            var(--color2) 75%,
+            transparent 100%);
+    opacity: .5;
+    filter: brightness(.5) contrast(1);
+    z-index: 1;
+}
+
+.playing-card:after {
+    opacity: 1;
+    background-image: url("https://assets.codepen.io/13471/sparkles.gif"),
+        url(https://assets.codepen.io/13471/holo.png),
+        linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%);
+    background-position: 50% 50%;
+    background-size: 160%;
+    background-blend-mode: overlay;
+    z-index: 2;
+    filter: brightness(1) contrast(1);
+    transition: all .33s ease;
+    mix-blend-mode: color-dodge;
+    opacity: .75;
+}
+
+.playing-card:hover:before,
+.playing-card:hover:after {
+    opacity: 1;
+}
+
+.playing-card.selected-for-sale {
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
+    pointer-events: auto;
+}
+
+.selected-card-preview {
+    background-color: #040712;
+    background-image: var(--card-bg);
+    background-size: cover;
+    background-position: center;
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.3s ease;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.preview-card {
+    background: rgba(0, 0, 0, 0.7);
+    padding: 1rem;
+    border-radius: 4px;
+    backdrop-filter: blur(2px);
+}
+
+.selected-card-preview .card-title {
+    font-size: 1.2em;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    margin-bottom: 0.5rem;
+}
+
+.selected-card-preview .sell-price {
+    color: #ffd700;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.selected-card-preview {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1rem;
+    border-radius: 8px;
+    text-align: center;
+    transition: opacity 0.3s ease;
+}
+
+.selected-card-preview .card-title {
+    font-size: 1.2em;
+}
+
+.card-placeholder {
+    color: rgba(255, 255, 255, 0.5);
+    padding: 1rem;
+    text-align: center;
+    font-style: italic;
+}
+
+.selected-card-preview .sell-price {
+    color: #ffd700;
+}

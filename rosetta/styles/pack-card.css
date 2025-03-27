@@ -1,0 +1,146 @@
+.pack-card {
+    --card-width: 240px;
+    --card-height: 336px;
+    width: var(--card-width);
+    height: var(--card-height);
+    position: relative;
+    overflow: hidden;
+    border-radius: 5% / 3.5%;
+    background-color: #040712;
+    background-image: var(--card-bg, url('/assets/default.png'));
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform-style: preserve-3d;
+    transform-origin: center;
+    touch-action: none;
+    z-index: 10;
+
+    box-shadow:
+        -7px -7px 10px -5px transparent,
+        7px 7px 10px -5px transparent,
+        0 0 5px 0px rgba(255, 255, 255, 0),
+        0 55px 35px -20px rgba(0, 0, 0, 0.5);
+}
+
+.pack-card:hover {
+    box-shadow:
+        0 0 13px 4px rgba(255, 255, 255, 0.3),
+        0 55px 35px -20px rgba(0, 0, 0, 0.5);
+}
+
+.pack-card:before,
+.pack-card:after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    top: 0;
+    background-repeat: no-repeat;
+    opacity: .5;
+    mix-blend-mode: color-dodge;
+    transition: all .33s ease;
+}
+
+.pack-card:before {
+    background-position: 50% 50%;
+    background-size: 300% 300%;
+    background-image: linear-gradient(115deg,
+            transparent 0%,
+            var(--color1) 25%,
+            transparent 47%,
+            transparent 53%,
+            var(--color2) 75%,
+            transparent 100%);
+    opacity: .5;
+    filter: brightness(.5) contrast(1);
+    z-index: 1;
+}
+
+.pack-card:after {
+    opacity: 1;
+    background-image: url("https://assets.codepen.io/13471/sparkles.gif"),
+        url(https://assets.codepen.io/13471/holo.png),
+        linear-gradient(125deg, #ff008450 15%, #fca40040 30%, #ffff0030 40%, #00ff8a20 60%, #00cfff40 70%, #cc4cfa50 85%);
+    background-position: 50% 50%;
+    background-size: 160%;
+    background-blend-mode: overlay;
+    z-index: 2;
+    filter: brightness(1) contrast(1);
+    transition: all .33s ease;
+    mix-blend-mode: color-dodge;
+    opacity: .75;
+}
+
+.pack-card:hover:before,
+.pack-card:hover:after {
+    opacity: 1;
+}
+
+.pack-button {
+    width: 120px;
+    height: 180px;
+    background: linear-gradient(45deg, #2a2a2a, #3a3a3a);
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pack-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.pack-button-content {
+    position: absolute;
+    inset: 0;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.pack-button .pack-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+}
+
+.pack-button .pack-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+.pack-button .pack-hover-info {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.pack-button:hover .pack-hover-info {
+    opacity: 1;
+}
+
+.pack-button.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.pack-button.disabled .pack-price {
+    color: #ff4444;
+}
