@@ -1,0 +1,233 @@
+.pack-opening-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    perspective: 1200px;
+}
+
+.pack-contents {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -60%);
+    display: flex;
+    gap: 3rem;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Core pack-item styles */
+.pack-item {
+    transform: scale(1);
+    perspective: 1000px;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
+}
+
+/* Card specific styles */
+.pack-item[data-type="card"] {
+    width: 240px;
+    height: 336px;
+}
+
+/* Tile specific styles - Override pack-item dimensions */
+.pack-item[data-type="tile"] {
+    width: 120px;
+    height: 120px;
+}
+
+/* Pack tile styling */
+.pack-contents .tile {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-radius: 8px;
+    background: #f0f0f0;
+    transition: transform 0.2s ease;
+}
+
+/* Hover effect */
+.pack-item[data-type="tile"]:hover .tile {
+    transform: scale(1.05);
+}
+
+/* Letter and points styling */
+.pack-contents .tile .letter {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+.pack-contents .tile .points {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 1.2em;
+    font-weight: bold;
+    color: rgba(0, 0, 0, 0.8);
+}
+
+/* Remove data-type specific selectors and keep animations generic */
+.pack-item.fade-down {
+    animation: fadeDown 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.pack-item.fade-up {
+    animation: fadeUp 0.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.pack-item .pack-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+}
+
+.pack-item .card-face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    padding: 1.5rem;
+    pointer-events: none;
+}
+
+.pack-item .card-icon {
+    font-size: 4em;
+    margin-bottom: 0.5rem;
+}
+
+.pack-item .card-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    text-align: center;
+}
+
+/* Card rarity specific styling */
+.pack-item[data-rarity="rare"] .pack-card {
+    --color1: #4444ff;
+    --color2: #00ffaa;
+    box-shadow: 0 0 20px rgba(0, 100, 255, 0.3);
+}
+
+.pack-item[data-rarity="epic"] .pack-card {
+    --color1: #ff00ff;
+    --color2: #00ffff;
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.3);
+}
+
+.pack-item[data-rarity="common"] .pack-card {
+    --color1: #ffaa00;
+    --color2: #ff00aa;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeDown {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: none;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(40px);
+        pointer-events: none;
+    }
+}
+
+@keyframes fadeUp {
+    0% {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: none;
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateY(-40px);
+        pointer-events: none;
+    }
+}
+
+.pack-tooltip {
+    position: absolute;
+    top: -80%;
+    left: 50%;
+    transform: translate(-50%, 20px);
+    min-width: 500px;
+    background: #333;
+    color: white;
+    padding: 2rem;
+    border-radius: 8px;
+    font-size: 1.4em;
+    opacity: 0;
+    pointer-events: none;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    z-index: 2001;
+}
+
+.pack-tooltip.active {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
+
+.pack-tooltip .header {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.pack-tooltip .content {
+    color: #ccc;
+    white-space: pre-line;
+    line-height: 1.6;
+    font-size: 1em;
+}
+
+.selection-hint {
+    position: absolute;
+    bottom: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2em;
+    text-align: center;
+}

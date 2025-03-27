@@ -1,0 +1,147 @@
+.scoring-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.scoring-overlay.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.score-container {
+    position: relative;
+    left: 40%;
+    transform: translateX(-100%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 2rem;
+    border-radius: 12px;
+    min-width: 300px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.score-display {
+    font-size: 100px;
+    background: linear-gradient(45deg, #fff, #ccc);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 2px 10px rgba(255, 255, 255, 0.3);
+    font-weight: bold;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.highlight-pulse {
+    animation: pulse 0.2s ease-out;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.score-step {
+    font-size: 40px;
+    color: rgba(255, 255, 255, 0.8);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.2s ease;
+}
+
+.score-step.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.highlight {
+    animation: highlight-pulse 0.2s ease-out;
+    transform: scale(1.1)
+}
+
+@keyframes highlight-pulse {
+    0% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+        filter: brightness(1);
+    }
+}
+
+.score-operation {
+    font-size: 40px;
+    /* Larger operation text */
+    color: rgba(255, 255, 255, 0.9);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s ease;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+.score-operation.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.operation-symbol {
+    color: #4CAF50;
+    /* Green for additions */
+}
+
+.operation-symbol.multiply {
+    color: #2196F3;
+    /* Blue for multiplications */
+}
+
+/* Score animations */
+@keyframes numberTransition {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.score-display.updating {
+    animation: numberTransition 0.2s ease-out;
+}
+
+.score-display.invalid {
+    color: #ff4444;
+    font-size: 2em;
+}

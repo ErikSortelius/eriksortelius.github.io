@@ -1,0 +1,33 @@
+.card-tooltip {
+    position: fixed;
+    top: 50%;
+    left: 10%;
+    transform: translate(-50%, -50%);
+    width: 400px;
+    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 1.5rem;
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.card-tooltip.active {
+    opacity: 1;
+}
+
+.card-tooltip .header {
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.card-tooltip .content {
+    color: #ccc;
+    line-height: 1.4;
+    font-size: 1.1em;
+    white-space: pre-line;
+}

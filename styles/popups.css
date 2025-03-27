@@ -1,0 +1,1088 @@
+/* Menu Screen */
+#menu-screen {
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.menu-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Base popup */
+.popup {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.95);
+    min-width: 400px;
+    background: #1a1a1a;
+    border-radius: 12px;
+    padding: 2rem;
+    opacity: 0;
+    visibility: hidden;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup.active {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+}
+
+/* Popup header */
+.popup-header {
+    text-align: center;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.popup-header h2 {
+    font-size: 2em;
+    color: #fff;
+}
+
+/* Popup content sections */
+.popup-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.popup-section {
+    background: #333;
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+/* Popup actions */
+.popup-actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: auto;
+}
+
+.popup-button {
+    padding: 0.8rem 1.5rem;
+    border-radius: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.1);
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.popup-button:disabled {
+    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #ff4444;
+}
+
+.popup-button:hover {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.popup-button.primary {
+    background: #2196F3;
+    border: none;
+}
+
+.popup-button.primary:hover {
+    background: #1976D2;
+}
+
+.popup-button.secondary:hover {
+    background: #444;
+}
+
+.popup-button.active {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+    pointer-events: auto;
+}
+
+.popup-button.active:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Specific popup types */
+.popup.game-over {
+    top: 40%;
+    background: rgba(244, 67, 54, 0.2);
+    box-shadow: 0 2px 8px rgba(244, 67, 54, 0.1);
+}
+
+.game-over .popup-content {
+    padding: 2rem;
+}
+
+.game-over-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    min-width: 400px;
+}
+
+.stat-group {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+}
+
+.stat-item {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 8px;
+}
+
+.stat-icon {
+    font-size: 24px;
+}
+
+.stat-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.stat-label {
+    color: #999;
+    font-size: 14px;
+}
+
+.stat-value {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Animation for game over popup */
+.game-over.popup.active .stat-item {
+    animation: fadeIn 0.5s ease forwards;
+    opacity: 0;
+}
+
+.game-over.popup.active .stat-item:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.game-over.popup.active .stat-group:nth-child(2) .stat-item:nth-child(1) {
+    animation-delay: 0.2s;
+}
+
+.game-over.popup.active .stat-group:nth-child(2) .stat-item:nth-child(2) {
+    animation-delay: 0.3s;
+}
+
+/* Shop */
+.popup.shop {
+    width: 1200px;
+    background: #1a1a1a;
+    display: grid;
+    grid-template-columns: 1fr 350px;
+    padding: 0;
+    top: 32%;
+    left: 50%;
+    height: 720px;
+}
+
+.shop-main {
+    padding: 2rem;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-balance {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2em;
+}
+
+.shop-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.shop-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-section h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2em;
+    color: #fff;
+    opacity: 0.9;
+}
+
+.tile-showcase {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.tile-preview {
+    width: 120px;
+    height: 120px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tile-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.pack-title {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+}
+
+.pack-price {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    color: #ffd700;
+    margin-top: auto;
+    font-size: 1.2em;
+}
+
+.pack-details {
+    font-size: 0.9em;
+    color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pack-price {
+    margin-top: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: bold;
+    color: #ffd700;
+}
+
+/* Rewards sidebar */
+.rewards-sidebar {
+    background: rgba(255, 255, 255, 0.03);
+    padding: 2rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.shop-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.shop-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-tile-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.pack-section {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    align-content: start;
+}
+
+.victory-container {
+    display: flex;
+    gap: 2rem;
+    max-width: 1600px;
+    margin: 0 auto;
+    pointer-events: none;
+}
+
+.victory-container .game-popup {
+    top: 40%;
+    height: 800px;
+    margin: 0;
+    pointer-events: all;
+    display: flex;
+    flex-direction: column;
+}
+
+.rewards-panel {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.reward-row {
+    display: flex;
+    flex-direction: column;
+}
+
+.reward-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.reward-details {
+    flex: 1;
+    display: flex;
+    justify-content: space-between;
+}
+
+.reward-label {
+    color: #aaa;
+    font-size: 0.9em;
+}
+
+.reward-value {
+    font-weight: 600;
+}
+
+/* Debug popup specific */
+.popup.debug {
+    width: 1200px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.debug-section {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+/* Card grid in debug popup */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.card-grid label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.card-grid label:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Tile bag popup specific */
+#remainingTilesPopup {
+    top: 40%;
+    width: 1400px;
+}
+
+.tile-count-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+/* Special Tiles Section in Remaining Tiles Popup */
+.special-tile-list {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.special-tile-list .tiles-container {
+    display: flex;
+    padding: 1rem;
+    gap: 0.2rem;
+    justify-items: center;
+    position: relative;
+}
+
+.no-special-tiles {
+    color: rgba(255, 255, 255, 0.3);
+    text-align: center;
+    padding: 1rem;
+    font-style: italic;
+    width: 100%;
+}
+
+/* Shop layout updates */
+.shop-content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
+.shop-actions-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.shop-section {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    padding: 1.5rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.shop-section.packs {
+    margin-top: 1rem;
+}
+
+/* Sell cards section */
+.sell-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.sell-card-label {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.5em;
+    text-align: center;
+    padding: 0.5rem;
+}
+
+.sell-actions {
+    display: flex;
+    justify-content: center;
+}
+
+.sell-cards {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+}
+
+.sell-cards-preview {
+    width: 100px;
+    height: 150px;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-placeholder {
+    color: rgba(255, 255, 255, 0.3);
+    font-size: 0.9em;
+    text-align: center;
+    padding: 1rem;
+}
+
+.sell-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+/* Pack section updates */
+.pack-rack {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+    justify-content: center;
+}
+
+/* Update pack card content styling */
+.pack-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.pack-type {
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 0.9em;
+}
+
+.pack-contents {
+    color: rgba(255, 255, 255, 0.4);
+    font-size: 0.8em;
+    line-height: 1.4;
+}
+
+.tile-tooltip {
+    min-width: 200px;
+    padding: 1rem;
+}
+
+.tile-tooltip .header {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tile-tooltip .content {
+    color: #ccc;
+    white-space: pre-line;
+    text-align: left;
+    line-height: 1.4;
+}
+
+.pack-card.disabled .pack-title {
+    opacity: 0.5;
+}
+
+.pack-card.disabled .pack-price {
+    color: #ff4444;
+}
+
+.tile-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9em;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Pack Opening Overlay */
+.pack-opening-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.pack-opening-overlay.fade-out {
+    animation: fadeOut 0.3s ease-out forwards;
+}
+
+.opening-pack .pack-art {
+    width: 100%;
+    height: 100%;
+    background: url('https://assets.codepen.io/13471/sparkles.gif'), linear-gradient(45deg, #2196F3, #9C27B0);
+    background-size: cover;
+    background-blend-mode: overlay;
+    border-radius: 16px;
+    position: relative;
+    transform-origin: center;
+    box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+}
+
+.opening-pack.opening .pack-art {
+    opacity: 0;
+}
+
+.pack-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 45%,
+            rgba(255, 255, 255, 0.7) 50%,
+            rgba(255, 255, 255, 0.2) 55%,
+            transparent 100%);
+    animation: shine 2s infinite;
+}
+
+.pack-contents {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards 0.5s;
+}
+
+.pack-item {
+    transform: scale(0);
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.pack-item[data-rarity="rare"] {
+    animation-delay: 0.1s;
+}
+
+.pack-item[data-rarity="epic"] {
+    animation-delay: 0.2s;
+}
+
+.skip-button {
+    position: absolute;
+    bottom: -60px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 0.8rem 2rem;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 6px;
+    color: white;
+    transition: all 0.2s ease;
+}
+
+.skip-button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%)
+    }
+
+    20%,
+    100% {
+        transform: translateX(100%)
+    }
+}
+
+@keyframes popIn {
+    from {
+        transform: scale(0) rotate(-10deg);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* Enhanced Pack Opening Overlay */
+.pack-opening-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.95);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.opening-pack {
+    width: 240px;
+    height: 336px;
+    position: relative;
+    perspective: 1200px;
+    transform-style: preserve-3d;
+}
+
+.pack-art {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transform-origin: center;
+    transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+/* Pack type specific styling */
+.pack-art.basic {
+    background: linear-gradient(45deg, #9E9E9E, #e0e0e0);
+}
+
+.pack-art.jumbo {
+    background: linear-gradient(45deg, #9E9E9E, #BDBDBD);
+}
+
+.pack-art.premium {
+    background: linear-gradient(45deg, #9E9E9E, #BDBDBD);
+}
+
+.pack-art.ultra {
+    background: linear-gradient(45deg, #9E9E9E, #BDBDBD);
+}
+
+.pack-art.stacked {
+    background: linear-gradient(45deg, #9E9E9E, #BDBDBD);
+}
+
+.pack-glow {
+    position: absolute;
+    inset: -20px;
+    background: inherit;
+    filter: blur(20px);
+    opacity: 0.5;
+    transition: opacity 0.5s ease;
+}
+
+.pack-shine {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg,
+            transparent 0%,
+            rgba(255, 255, 255, 0.2) 45%,
+            rgba(255, 255, 255, 0.7) 50%,
+            rgba(255, 255, 255, 0.2) 55%,
+            transparent 100%);
+    animation: shine 3s infinite;
+    opacity: 0.5;
+    transition: opacity 0.5s ease;
+}
+
+.pack-name {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    text-align: center;
+    color: white;
+    font-size: 1.4em;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.opening-pack.hover .pack-glow {
+    opacity: 0.8;
+}
+
+.opening-pack.hover .pack-shine {
+    opacity: 0.8;
+}
+
+/* Opening animation */
+.opening-pack.opening .pack-art {
+    transform:
+        scale(0.8);
+    opacity: 0;
+}
+
+/* Pack contents */
+.pack-contents {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: flex;
+    gap: 2rem;
+    opacity: 0;
+    animation: fadeIn 0.5s ease-out forwards 0.5s;
+}
+
+.pack-item {
+    transform: scale(0);
+}
+
+/* Rarity specific effects */
+.card.rare .card-glow,
+.card.epic .card-glow {
+    position: absolute;
+    inset: -20px;
+    background: inherit;
+    filter: blur(20px);
+    opacity: 0;
+    animation: glowPulse 2s infinite;
+}
+
+.card.rare {
+    background: linear-gradient(45deg, #1976D2, #42A5F5);
+}
+
+.card.epic {
+    background: linear-gradient(45deg, #7B1FA2, #BA68C8);
+}
+
+@keyframes glowPulse {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.6;
+    }
+}
+
+@keyframes shine {
+    0% {
+        transform: translateX(-100%) rotate(45deg);
+    }
+
+    20%,
+    100% {
+        transform: translateX(150%) rotate(45deg);
+    }
+}
+
+@keyframes popIn {
+    0% {
+        transform: scale(0) rotate(-15deg);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+/* Debug popup updates */
+.popup.debug {
+    width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.debug-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+}
+
+.cards-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cards-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.card-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.card-controls button {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9em;
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.card-categories {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+}
+
+.card-category {
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 8px;
+    padding: 1rem;
+}
+
+.category-header {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.category-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* Update card grid labels */
+.card-grid label {
+    padding: 0.5rem 0.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    font-size: 0.9em;
+}
+
+.card-grid label:hover {
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Scrollbar styling */
+.popup.debug::-webkit-scrollbar {
+    width: 8px;
+}
+
+.popup.debug::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.popup.debug::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.popup.debug::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* Tutorial popup specific styles */
+.popup.tutorial {
+    width: 600px;
+    max-height: 80vh;
+}
+
+.tutorial-section {
+    margin-bottom: 2rem;
+}
+
+.tutorial-section h3 {
+    color: #2196F3;
+    font-size: 1.4em;
+    margin-bottom: 1rem;
+}
+
+.tutorial-section ul {
+    list-style: none;
+    padding: 0;
+}
+
+.tutorial-section li {
+    padding: 0.5rem 0;
+    color: #fff;
+    position: relative;
+    padding-left: 1.5rem;
+}
+
+.tutorial-section li:before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: #2196F3;
+}
+
+.tile-examples {
+    display: flex;
+    gap: 1rem;
+    margin: 1rem 0;
+    justify-content: center;
+}
+
+/* Game Won Popup */
+.popup.game-won {
+    background: rgba(76, 175, 80, 0.2);
+    box-shadow: 0 2px 8px rgba(76, 175, 80, 0.1);
+    width: 500px;
+}
+
+.popup.game-won .popup-header h2 {
+    color: #4CAF50;
+}
+
+.game-won-panel {
+    text-align: center;
+    padding: 2rem;
+}
+
+.game-won-panel p {
+    font-size: 1.2em;
+    margin-bottom: 1rem;
+    color: #fff;
+}
+
+.game-won-panel p:last-child {
+    margin-bottom: 0;
+    font-size: 1.4em;
+    font-weight: bold;
+    color: #4CAF50;
+}
+
+.popup.game-won .popup-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+}
+
+.popup.game-won .popup-button.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.popup.game-won .popup-button.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
