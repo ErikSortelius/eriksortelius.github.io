@@ -2,7 +2,7 @@ export class WordManager {
     constructor() {
         this.words = new Set();
         this.STORAGE_KEY = 'rosetta_dictionary';
-        this.WORD_LIST_URL = '/data/wordlist.txt';
+        this.WORD_LIST_URL = 'data/wordList.txt';
 
         this.initializeWords();
     }
