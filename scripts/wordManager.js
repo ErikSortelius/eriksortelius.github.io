@@ -1,24 +1,13 @@
 export class WordManager {
     constructor() {
         this.words = new Set();
-        this.cache = new Map();
         this.STORAGE_KEY = 'rosetta_dictionary';
-        this.WORD_LIST_URL = window.location.hostname === 'localhost'
-            ? 'http://localhost:8000/data/wordlist.txt'
-            : '/data/wordlist.txt';
+        this.WORD_LIST_URL = '/data/wordlist.txt';
 
         this.initializeWords();
     }
 
     async initializeWords() {
-        // Load cached words from localStorage
-        const cached = localStorage.getItem(this.STORAGE_KEY);
-        if (cached) {
-            const parsed = JSON.parse(cached);
-            this.cache = new Map(Object.entries(parsed));
-
-        }
-
         const response = await fetch(this.WORD_LIST_URL);
         const reader = response.body.getReader();
         const decoder = new TextDecoder();
@@ -62,27 +51,6 @@ export class WordManager {
         return isValid;
     }
 
-    updateCache(word, isValid) {
-        this.cache.set(word, isValid);
-
-        // Update localStorage (throttled to prevent excessive writes)
-        if (!this._saveTimeout) {
-            this._saveTimeout = setTimeout(() => {
-                const cacheObj = Object.fromEntries(this.cache);
-                try {
-                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cacheObj));
-                } catch (e) {
-                    // If storage is full, clear it and try again
-                    if (e.name === 'QuotaExceededError') {
-                        localStorage.clear();
-                        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(cacheObj));
-                    }
-                }
-                this._saveTimeout = null;
-            }, 1000);
-        }
-    }
-
     // Word processing methods moved from WordProcessor
     async processWordSubmission(gameManager) {
         gameManager.frozen = true;
@@ -121,14 +89,7 @@ export class WordManager {
     }
 
     async checkWord(word) {
-        // First check cache
-        if (this.cache.has(word)) {
-            return this.cache.get(word);
-        }
-
-        // Then check dictionary
         const isValid = this.isValidWord(word);
-        this.updateCache(word, isValid);
         return isValid;
     }
 
