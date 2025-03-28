@@ -354,7 +354,6 @@ export class GameManager {
             if (returnButton) {
                 returnButton.onclick = () => {
                     popup.classList.remove('active');
-                    document.getElementById('canvas').classList.remove('hidden');
                     const menuScreen = document.getElementById('menu-screen');
                     const gameScreen = document.getElementById('game-screen');
                     if (menuScreen) menuScreen.classList.add('active');
@@ -817,7 +816,6 @@ export class GameManager {
             if (returnButton) {
                 returnButton.onclick = () => {
                     popup.classList.remove('active');
-                    document.getElementById('canvas').classList.remove('hidden');
                     const menuScreen = document.getElementById('menu-screen');
                     const gameScreen = document.getElementById('game-screen');
                     if (menuScreen) menuScreen.classList.add('active');
