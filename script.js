@@ -185,14 +185,14 @@ function updateClock() {
   const dateString = formatDate(now);
   const weekdayString = getWeekday(now);
   const weekNumber = getWeekNumber(now);
-  
+
   // Update display with smooth transitions
   updateTimeWithTransition(timeString);
-  
+
   if (dateElement.textContent !== dateString) {
     dateElement.style.opacity = 0;
     dateElement.style.transform = 'translateY(8px)';
-    
+
     requestAnimationFrame(() => {
       dateElement.textContent = dateString;
       // Force reflow
@@ -201,11 +201,11 @@ function updateClock() {
       dateElement.style.transform = 'translateY(0)';
     });
   }
-  
+
   if (weekdayElement.textContent !== weekdayString) {
     weekdayElement.style.opacity = 0;
     weekdayElement.style.transform = 'translateY(8px)';
-    
+
     requestAnimationFrame(() => {
       weekdayElement.textContent = weekdayString;
       // Force reflow
@@ -214,9 +214,9 @@ function updateClock() {
       weekdayElement.style.transform = 'translateY(0)';
     });
   }
-  
+
   weekNumberElement.textContent = `Week ${weekNumber}`;
-  
+
   // Update day/night dial
   updateDayNightDial(now);
 }
@@ -225,19 +225,19 @@ function updateClock() {
 function updateTimeWithTransition(newTimeString) {
   const currentTimeDigits = timeElement.textContent.split('');
   const newTimeDigits = newTimeString.split('');
-  
+
   // Clear current time display
   timeElement.innerHTML = '';
-  
+
   // Create span for each digit with transition effect
   newTimeDigits.forEach((digit, index) => {
     const digitSpan = document.createElement('span');
     digitSpan.textContent = digit;
-    
+
     if (currentTimeDigits[index] !== digit) {
       digitSpan.style.opacity = 0;
       digitSpan.style.transform = 'translateY(8px)';
-      
+
       requestAnimationFrame(() => {
         // Force reflow
         digitSpan.offsetHeight;
@@ -245,7 +245,7 @@ function updateTimeWithTransition(newTimeString) {
         digitSpan.style.transform = 'translateY(0)';
       });
     }
-    
+
     timeElement.appendChild(digitSpan);
   });
 }
@@ -255,14 +255,14 @@ function updateDayNightDial(now) {
   // Rotate dial based on current hour
   const rotationAngle = getCurrentHourAngle();
   dialRing.style.transform = `rotate(${rotationAngle}deg)`;
-  
+
   // Update sun/moon visibility based on time
   const isDay = checkIsDayTime(now);
-  
+
   // Set proper state for sun/moon icons without transition for initial load
   sunIcon.style.opacity = isDay ? 1 : 0;
   sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
-  
+
   moonIcon.style.opacity = isDay ? 0 : 1;
   moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
 }
@@ -270,18 +270,18 @@ function updateDayNightDial(now) {
 // Update day/night dial based on sunrise and sunset times
 function updateDayNightDialWithSunData(sunrise, sunset) {
   const now = new Date();
-  
+
   // Check if we have valid sunrise/sunset data
   if (!sunrise || !sunset) {
     // Fallback to the default 6AM-9PM logic if no sun data
     const hours = now.getHours();
     const isDay = hours >= 6 && hours < 21;
-    
+
     // Calculate position in day/night cycle
     const dayStart = 6;
     const dayEnd = 21;
     const totalDay = dayEnd - dayStart;
-    
+
     let percentage;
     if (isDay) {
       percentage = (hours - dayStart) / totalDay;
@@ -297,38 +297,38 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
         percentage = 0.5 + (hoursAfterSunset / (totalNight * 2));
       }
     }
-    
+
     // Keep percentage between 0 and 1
     percentage = Math.min(Math.max(percentage, 0), 1);
-    
+
     // Convert to degrees (0-360)
     const rotationAngle = percentage * 360;
-    
+
     // Update the dial
     if (dialRing) {
       dialRing.style.transform = `rotate(${rotationAngle}deg)`;
     }
-    
+
     // Update sun/moon visibility
     if (sunIcon) {
       sunIcon.style.opacity = isDay ? 1 : 0;
       sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
     }
-    
+
     if (moonIcon) {
       moonIcon.style.opacity = isDay ? 0 : 1;
       moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
     }
-    
+
     return;
   }
 
   // Use actual sunrise/sunset data when available
   const isDay = now >= sunrise && now < sunset;
-  
+
   // Calculate position in day/night cycle
   let percentage;
-  
+
   if (isDay) {
     // It's daytime - calculate how far through the day we are
     const dayLength = sunset - sunrise;
@@ -353,24 +353,24 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
       percentage = 0.5 + (timeElapsed / (nightLength * 2));
     }
   }
-  
+
   // Keep percentage between 0 and 1
   percentage = Math.min(Math.max(percentage, 0), 1);
-  
+
   // Convert to degrees (0-360)
   const rotationAngle = percentage * 360;
-  
+
   // Update the dial
   if (dialRing) {
     dialRing.style.transform = `rotate(${rotationAngle}deg)`;
   }
-  
+
   // Update sun/moon visibility
   if (sunIcon) {
     sunIcon.style.opacity = isDay ? 1 : 0;
     sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
   }
-  
+
   if (moonIcon) {
     moonIcon.style.opacity = isDay ? 0 : 1;
     moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
@@ -379,9 +379,13 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
 
 // Create link sections
 function createLinkSections() {
-  categories.forEach(category => {
+  categories.forEach((category, index) => {
     const section = document.createElement('div');
     section.className = 'link-section';
+    
+    // Apply initial styles for animation
+    section.style.opacity = '0';
+    section.style.transform = 'translateY(20px)';
     
     const title = document.createElement('h2');
     title.className = `link-section-title ${category.name.toLowerCase()}`;
@@ -414,6 +418,15 @@ function createLinkSections() {
     section.appendChild(title);
     section.appendChild(linkList);
     linksContainer.appendChild(section);
+    
+    // Animate each section with a staggered delay
+    setTimeout(() => {
+      requestAnimationFrame(() => {
+        section.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+        section.style.opacity = '1';
+        section.style.transform = 'translateY(0)';
+      });
+    }, 100 * index); // Stagger the animations
   });
 }
 
@@ -450,10 +463,10 @@ function setupWeather() {
   } else {
     fetchWeatherData();
   }
-  
+
   // Remove automatic updates - only fetch on page load and manual click
   // No more setInterval here
-  
+
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
@@ -470,7 +483,7 @@ function getUserLocation() {
       reject(new Error('Geolocation is not supported by your browser'));
       return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(
       position => {
         resolve(position.coords);
@@ -494,14 +507,14 @@ function fetchWeatherData(forceRefresh = false) {
     displayWeatherData(cachedWeatherData);
     return;
   }
-  
+
   // Show loading state
   if (weatherIcon) {
     weatherIcon.innerHTML = `<div class="weather-loader"></div>`;
   }
-  
+
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${WEATHER_CONFIG.lat}&lon=${WEATHER_CONFIG.lon}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
-  
+
   fetch(apiUrl)
     .then(response => {
       if (!response.ok) {
@@ -525,15 +538,15 @@ function displayWeatherData(data) {
     // Get icon from mapping or use cloud as fallback
     const iconCode = data.weather[0].icon || '03d';
     const iconName = weatherIconMap[iconCode] || 'cloud';
-    
+
     // Get temperature and round to nearest whole number
     const temperature = Math.round(data.main.temp);
     const feelsLike = Math.round(data.main.feels_like);
-    
+
     // Get sunrise and sunset times for day/night dial
     const sunrise = new Date(data.sys.sunrise * 1000);
     const sunset = new Date(data.sys.sunset * 1000);
-    
+
     // Update UI
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
     if (temperatureElement) temperatureElement.textContent = `${temperature}°`;
@@ -546,11 +559,11 @@ function displayWeatherData(data) {
         .join(' ');
       weatherConditionElement.textContent = description;
     }
-    
+
     // Fade in the weather container if it was hidden
-    if (weatherContainer && 
-        (weatherContainer.style.visibility === 'hidden' || 
-         parseFloat(weatherContainer.style.opacity) === 0)) {
+    if (weatherContainer &&
+      (weatherContainer.style.visibility === 'hidden' ||
+        parseFloat(weatherContainer.style.opacity) === 0)) {
       // Use requestAnimationFrame instead of setTimeout for smoother animation
       requestAnimationFrame(() => {
         weatherContainer.style.visibility = 'visible';
@@ -565,13 +578,13 @@ function displayWeatherData(data) {
         weatherContainer.classList.remove('weather-updated');
       }, 1000);
     }
-    
+
     // Update day/night dial based on sunrise/sunset if available
     updateDayNightDialWithSunData(sunrise, sunset);
   } catch (error) {
     console.error('Error parsing weather data:', error);
     displayWeatherError();
-    
+
     // Still need to show the container even if there's an error
     if (weatherContainer) {
       weatherContainer.style.visibility = 'visible';
@@ -612,15 +625,15 @@ function getCachedWeatherData() {
   try {
     const cachedItem = localStorage.getItem('weatherCache');
     if (!cachedItem) return null;
-    
+
     const { data, timestamp } = JSON.parse(cachedItem);
     const now = Date.now();
-    
+
     // Check if cache is still valid
     if (now - timestamp < WEATHER_CONFIG.cacheTimeMs) {
       return data;
     }
-    
+
     return null;
   } catch (error) {
     console.error('Error getting cached weather data:', error);
@@ -633,19 +646,19 @@ function init() {
   // Hide icons during initialization to prevent flash
   if (sunIcon) sunIcon.style.opacity = 0;
   if (moonIcon) moonIcon.style.opacity = 0;
-  
+
   // Initial clock update
   updateClock();
-  
+
   // Set up clock interval - update every second
   setInterval(updateClock, 1000);
-  
+
   // Create link sections
   createLinkSections();
-  
+
   // Setup search input
   setupSearchInput();
-  
+
   // Setup weather
   setupWeather();
 }
