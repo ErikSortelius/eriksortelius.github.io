@@ -534,13 +534,6 @@ function displayWeatherData(data) {
     const sunrise = new Date(data.sys.sunrise * 1000);
     const sunset = new Date(data.sys.sunset * 1000);
     
-    // Format sunrise/sunset times
-    const sunriseTime = sunrise.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-    const sunsetTime = sunset.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false});
-    
-    // Get location name
-    const locationName = data.name || 'Unknown';
-    
     // Update UI
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
     if (temperatureElement) temperatureElement.textContent = `${temperature}°`;
@@ -552,17 +545,6 @@ function displayWeatherData(data) {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
       weatherConditionElement.textContent = description;
-    }
-    
-    // Update new location and sun time elements
-    if (locationElement) locationElement.textContent = locationName;
-    if (sunriseElement) {
-      const sunriseContent = sunriseElement.innerHTML.split('</svg>')[0] + '</svg>' + sunriseTime;
-      sunriseElement.innerHTML = sunriseContent;
-    }
-    if (sunsetElement) {
-      const sunsetContent = sunsetElement.innerHTML.split('</svg>')[0] + '</svg>' + sunsetTime;
-      sunsetElement.innerHTML = sunsetContent;
     }
     
     // Fade in the weather container if it was hidden
