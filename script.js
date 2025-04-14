@@ -267,12 +267,57 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
   
   // Check if we have valid sunrise/sunset data
   if (!sunrise || !sunset) {
-    // Fallback to the default logic if no sun data
-    updateDayNightDial(now);
+    // Fallback to the default 6AM-9PM logic if no sun data
+    const hours = now.getHours();
+    const isDay = hours >= 6 && hours < 21;
+    
+    // Calculate position in day/night cycle
+    const dayStart = 6;
+    const dayEnd = 21;
+    const totalDay = dayEnd - dayStart;
+    
+    let percentage;
+    if (isDay) {
+      percentage = (hours - dayStart) / totalDay;
+    } else {
+      if (hours < dayStart) {
+        // Before 6AM
+        const totalNight = 24 - totalDay;
+        percentage = 0.5 + (hours / (totalNight * 2));
+      } else {
+        // After 9PM
+        const totalNight = 24 - totalDay;
+        const hoursAfterSunset = hours - dayEnd;
+        percentage = 0.5 + (hoursAfterSunset / (totalNight * 2));
+      }
+    }
+    
+    // Keep percentage between 0 and 1
+    percentage = Math.min(Math.max(percentage, 0), 1);
+    
+    // Convert to degrees (0-360)
+    const rotationAngle = percentage * 360;
+    
+    // Update the dial
+    if (dialRing) {
+      dialRing.style.transform = `rotate(${rotationAngle}deg)`;
+    }
+    
+    // Update sun/moon visibility
+    if (sunIcon) {
+      sunIcon.style.opacity = isDay ? 1 : 0;
+      sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
+    }
+    
+    if (moonIcon) {
+      moonIcon.style.opacity = isDay ? 0 : 1;
+      moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
+    }
+    
     return;
   }
 
-  // Calculate if it's currently day or night based on sunrise/sunset
+  // Use actual sunrise/sunset data when available
   const isDay = now >= sunrise && now < sunset;
   
   // Calculate position in day/night cycle
@@ -412,9 +457,9 @@ function setupWeather() {
     }
   }, WEATHER_CONFIG.cacheTimeMs);
   
-  // Add event listener to weather container for manual refresh
-  if (weatherContainer) {
-    weatherContainer.addEventListener('click', () => {
+  // Add event listener to weather icon for manual refresh
+  if (weatherIcon) {
+    weatherIcon.addEventListener('click', () => {
       if (WEATHER_CONFIG.useGeolocation) {
         getUserLocation()
           .then(coords => {
@@ -431,30 +476,6 @@ function setupWeather() {
       }
     });
   }
-}
-
-// Function to get user's location
-function getUserLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported by your browser'));
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      position => {
-        resolve(position.coords);
-      },
-      error => {
-        reject(error);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 5000,
-        maximumAge: 10 * 60 * 1000 // 10 minutes
-      }
-    );
-  });
 }
 
 function fetchWeatherData(forceRefresh = false) {
@@ -500,19 +521,9 @@ function displayWeatherData(data) {
     const temperature = Math.round(data.main.temp);
     const feelsLike = Math.round(data.main.feels_like);
     
-    // Get sunrise and sunset times
+    // Get sunrise and sunset times for day/night dial
     const sunrise = new Date(data.sys.sunrise * 1000);
     const sunset = new Date(data.sys.sunset * 1000);
-    
-    // Format times as HH:MM
-    const formatTime = (date) => {
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      return `${hours}:${minutes}`;
-    };
-    
-    const sunriseTime = formatTime(sunrise);
-    const sunsetTime = formatTime(sunset);
     
     // Update UI
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
@@ -525,15 +536,6 @@ function displayWeatherData(data) {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
       weatherConditionElement.textContent = description;
-    }
-    if (locationElement) locationElement.textContent = data.name;
-    if (sunriseElement) {
-      const sunriseContent = sunriseElement.innerHTML.split('</svg>')[0] + '</svg>' + sunriseTime;
-      sunriseElement.innerHTML = sunriseContent;
-    }
-    if (sunsetElement) {
-      const sunsetContent = sunsetElement.innerHTML.split('</svg>')[0] + '</svg>' + sunsetTime;
-      sunsetElement.innerHTML = sunsetContent;
     }
     
     // Apply animations for smooth update

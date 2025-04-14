@@ -15,11 +15,37 @@
     <div class="max-width-container">
       <!-- Clock Section -->
       <div class="clock-container">
-        <div class="clock">
-          <h1 class="time">00:00</h1>
+        <!-- Top Row: Clock and Date -->
+        <div class="top-section">
+          <div class="clock">
+            <h1 class="time">00:00</h1>
+          </div>
+          <div class="date-info">
+            <p class="date">April 14, 2025</p>
+            <div class="weekday-info">
+              <span class="weekday">Monday</span>
+              <span class="week-number">Week 16</span>
+            </div>
+          </div>
         </div>
 
-        <div class="day-night-info">
+        <!-- Bottom Row: Weather and Day/Night Dial -->
+        <div class="bottom-section">
+          <div class="weather-container">
+            <div class="weather-icon" id="weatherIcon" title="Click to update weather">
+              <!-- Weather icon will be inserted here by JavaScript -->
+            </div>
+            <div class="weather-info">
+              <div class="weather-main">
+                <div class="temp-container">
+                  <span class="temperature" id="temperature">--°</span>
+                  <span class="feels-like" id="feelsLike">Feels: --°</span>
+                </div>
+                <span class="weather-condition" id="weatherCondition">--</span>
+              </div>
+            </div>
+          </div>
+
           <div class="day-night-dial">
             <div class="dial-ring">
               <div class="dial-marker"></div>
@@ -41,47 +67,6 @@
               <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
               </svg>
-            </div>
-          </div>
-
-          <div class="date-info">
-            <p class="date">April 14, 2025</p>
-            <div class="weekday-info">
-              <span class="weekday">Monday</span>
-              <span class="week-number">Week 16</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Weather Component -->
-        <div class="weather-container">
-          <div class="weather-icon" id="weatherIcon">
-            <!-- Weather icon will be inserted here by JavaScript -->
-          </div>
-          <div class="weather-info">
-            <div class="weather-main">
-              <div class="temp-container">
-                <span class="temperature" id="temperature">--°</span>
-                <span class="feels-like" id="feelsLike">Feels: --°</span>
-              </div>
-              <span class="weather-condition" id="weatherCondition">--</span>
-            </div>
-            <div class="weather-details">
-              <span class="location" id="location">--</span>
-              <div class="sun-times">
-                <span class="sunrise" id="sunrise">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 2v8"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 22H2"></path><path d="m8 6 4-4 4 4"></path><path d="M16 18a4 4 0 0 0-8 0"></path>
-                  </svg>
-                  --:--
-                </span>
-                <span class="sunset" id="sunset">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 10V2"></path><path d="m4.93 10.93 1.41 1.41"></path><path d="M2 18h2"></path><path d="M20 18h2"></path><path d="m19.07 10.93-1.41 1.41"></path><path d="M22 22H2"></path><path d="m16 6-4 4-4-4"></path><path d="M16 18a4 4 0 0 0-8 0"></path>
-                  </svg>
-                  --:--
-                </span>
-              </div>
             </div>
           </div>
         </div>
