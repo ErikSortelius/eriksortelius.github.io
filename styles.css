@@ -380,9 +380,9 @@ body {
 /* Weather styles */
 .weather-container {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   flex-grow: 1;
-  margin-right: 2rem;
+  margin-right: 1.5rem;
   opacity: 1;
   visibility: visible;
   transition: opacity 0.8s ease, visibility 0.8s ease;
@@ -392,14 +392,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 4rem;
-  height: 4rem;
-  margin-right: 1.25rem;
+  width: 3.75rem;
+  height: 3.75rem;
+  margin-right: 1rem;
   color: var(--blue-300);
   transition: transform 0.3s ease, opacity 0.2s ease;
   cursor: pointer;
   border-radius: 50%;
   padding: 0.5rem;
+  flex-shrink: 0;
 }
 
 .weather-icon:hover {
@@ -417,17 +418,21 @@ body {
 
 .weather-info {
   flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .weather-main {
   display: flex;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-start;
+  justify-content: space-between;
 }
 
 .temp-container {
   display: flex;
   flex-direction: column;
+  margin-right: 1rem;
 }
 
 .temperature {
@@ -446,6 +451,42 @@ body {
 .weather-condition {
   font-size: 1.125rem;
   color: var(--text-color-dim);
+  align-self: center;
+}
+
+.weather-details {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--text-color-dim);
+}
+
+.location {
+  font-style: italic;
+}
+
+.sun-times {
+  display: flex;
+  gap: 1rem;
+}
+
+.sunrise, .sunset {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.sunrise svg, .sunset svg {
+  color: var(--amber-300);
+}
+
+.day-night-separator {
+  width: 1px;
+  height: 4rem;
+  background-color: var(--border-color);
+  margin: 0 1.5rem;
 }
 
 .weather-loader {
@@ -498,11 +539,45 @@ body {
   
   .weather-container {
     margin-right: 0;
-    margin-bottom: 1.5rem;
-    justify-content: center;
+    margin-bottom: 1rem;
+    width: 100%;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  
+  .weather-icon {
+    margin-right: 0;
+    margin-bottom: 0.75rem;
+  }
+  
+  .weather-info {
+    align-items: center;
+  }
+  
+  .weather-main {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .temp-container {
+    align-items: center;
+    margin-right: 0;
+  }
+  
+  .day-night-separator {
+    width: 80%;
+    height: 1px;
+    margin: 0.5rem 0;
+  }
+  
+  .weather-details {
+    flex-direction: column;
+    gap: 0.5rem;
   }
   
   .search-input-wrapper {
-    width: 80%;
+    width: 100%;
   }
 }
