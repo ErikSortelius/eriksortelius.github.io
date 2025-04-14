@@ -383,6 +383,9 @@ body {
   align-items: center;
   flex-grow: 1;
   margin-right: 2rem;
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
 }
 
 .weather-icon {

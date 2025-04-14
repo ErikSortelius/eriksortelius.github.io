@@ -423,6 +423,12 @@ function setupSearchInput() {
 
 // Weather functions
 function setupWeather() {
+  // Hide weather container initially
+  if (weatherContainer) {
+    weatherContainer.style.opacity = '0';
+    weatherContainer.style.visibility = 'hidden';
+  }
+
   if (WEATHER_CONFIG.useGeolocation) {
     getUserLocation()
       .then(coords => {
@@ -439,41 +445,14 @@ function setupWeather() {
     fetchWeatherData();
   }
   
-  // Refresh weather data every 30 minutes
-  setInterval(() => {
-    if (WEATHER_CONFIG.useGeolocation) {
-      getUserLocation()
-        .then(coords => {
-          WEATHER_CONFIG.lat = coords.latitude;
-          WEATHER_CONFIG.lon = coords.longitude;
-          fetchWeatherData();
-        })
-        .catch(error => {
-          console.warn('Geolocation error on refresh, using default coordinates:', error);
-          fetchWeatherData();
-        });
-    } else {
-      fetchWeatherData();
-    }
-  }, WEATHER_CONFIG.cacheTimeMs);
+  // Remove automatic updates - only fetch on page load and manual click
+  // No more setInterval here
   
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
-      if (WEATHER_CONFIG.useGeolocation) {
-        getUserLocation()
-          .then(coords => {
-            WEATHER_CONFIG.lat = coords.latitude;
-            WEATHER_CONFIG.lon = coords.longitude;
-            fetchWeatherData(true); // Force refresh
-          })
-          .catch(error => {
-            console.warn('Geolocation error on manual refresh:', error);
-            fetchWeatherData(true); // Force refresh with default coordinates
-          });
-      } else {
-        fetchWeatherData(true); // Force refresh with default coordinates
-      }
+      // Don't get new location on manual refresh - use existing coordinates
+      fetchWeatherData(true); // Force refresh with existing coordinates
     });
   }
 }
@@ -538,8 +517,17 @@ function displayWeatherData(data) {
       weatherConditionElement.textContent = description;
     }
     
-    // Apply animations for smooth update
-    if (weatherContainer) {
+    // Fade in the weather container if it was hidden
+    if (weatherContainer && 
+        (weatherContainer.style.visibility === 'hidden' || 
+         parseFloat(weatherContainer.style.opacity) === 0)) {
+      // Small delay to ensure content is ready before animation
+      setTimeout(() => {
+        weatherContainer.style.visibility = 'visible';
+        weatherContainer.style.opacity = '1';
+      }, 100);
+    } else {
+      // Apply update animation if already visible
       weatherContainer.classList.add('weather-updated');
       setTimeout(() => {
         weatherContainer.classList.remove('weather-updated');
@@ -551,6 +539,12 @@ function displayWeatherData(data) {
   } catch (error) {
     console.error('Error parsing weather data:', error);
     displayWeatherError();
+    
+    // Still need to show the container even if there's an error
+    if (weatherContainer) {
+      weatherContainer.style.visibility = 'visible';
+      weatherContainer.style.opacity = '1';
+    }
   }
 }
 
