@@ -201,6 +201,7 @@ function updateDayNightDial(now) {
   // Update sun/moon visibility based on time
   const isDay = checkIsDayTime(now);
   
+  // Set proper state for sun/moon icons without transition for initial load
   sunIcon.style.opacity = isDay ? 1 : 0;
   sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
   
@@ -260,6 +261,10 @@ function setupSearchInput() {
 
 // Initialize the page
 function init() {
+  // Hide icons during initialization to prevent flash
+  if (sunIcon) sunIcon.style.opacity = 0;
+  if (moonIcon) moonIcon.style.opacity = 0;
+  
   // Initial clock update
   updateClock();
   

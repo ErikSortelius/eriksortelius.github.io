@@ -133,6 +133,7 @@ body {
   align-items: center;
   justify-content: center;
   transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+  opacity: 0; /* Hide both icons by default */
 }
 
 .sun-icon {
@@ -193,8 +194,7 @@ body {
 
 .search-input-wrapper {
   position: relative;
-  width: 50%;
-  min-width: 300px;
+  width: 100%; /* Changed from 50% to 100% to match clock container width */
   display: flex;
   align-items: center;
   background-color: var(--bg-color-light);
