@@ -463,6 +463,30 @@ function setupWeather() {
   }
 }
 
+// Function to get user's geolocation
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser'));
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        resolve(position.coords);
+      },
+      error => {
+        reject(error);
+      },
+      {
+        enableHighAccuracy: false, // Don't need high accuracy for weather
+        timeout: 5000, // 5 seconds timeout
+        maximumAge: 600000 // Cache location for 10 minutes
+      }
+    );
+  });
+}
+
 function fetchWeatherData(forceRefresh = false) {
   // Check if we have cached data
   const cachedWeatherData = forceRefresh ? null : getCachedWeatherData();
