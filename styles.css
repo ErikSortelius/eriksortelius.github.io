@@ -392,8 +392,8 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 3.75rem;
-  height: 3.75rem;
+  width: 4rem;
+  height: 4rem;
   margin-right: 1rem;
   color: var(--blue-300);
   transition: transform 0.3s ease, opacity 0.2s ease;
