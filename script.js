@@ -193,22 +193,26 @@ function updateClock() {
     dateElement.style.opacity = 0;
     dateElement.style.transform = 'translateY(8px)';
     
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       dateElement.textContent = dateString;
+      // Force reflow
+      dateElement.offsetHeight;
       dateElement.style.opacity = 1;
       dateElement.style.transform = 'translateY(0)';
-    }, 300);
+    });
   }
   
   if (weekdayElement.textContent !== weekdayString) {
     weekdayElement.style.opacity = 0;
     weekdayElement.style.transform = 'translateY(8px)';
     
-    setTimeout(() => {
+    requestAnimationFrame(() => {
       weekdayElement.textContent = weekdayString;
+      // Force reflow
+      weekdayElement.offsetHeight;
       weekdayElement.style.opacity = 1;
       weekdayElement.style.transform = 'translateY(0)';
-    }, 300);
+    });
   }
   
   weekNumberElement.textContent = `Week ${weekNumber}`;
@@ -234,10 +238,12 @@ function updateTimeWithTransition(newTimeString) {
       digitSpan.style.opacity = 0;
       digitSpan.style.transform = 'translateY(8px)';
       
-      setTimeout(() => {
+      requestAnimationFrame(() => {
+        // Force reflow
+        digitSpan.offsetHeight;
         digitSpan.style.opacity = 1;
         digitSpan.style.transform = 'translateY(0)';
-      }, 10);
+      });
     }
     
     timeElement.appendChild(digitSpan);
@@ -521,11 +527,13 @@ function displayWeatherData(data) {
     if (weatherContainer && 
         (weatherContainer.style.visibility === 'hidden' || 
          parseFloat(weatherContainer.style.opacity) === 0)) {
-      // Small delay to ensure content is ready before animation
-      setTimeout(() => {
+      // Use requestAnimationFrame instead of setTimeout for smoother animation
+      requestAnimationFrame(() => {
         weatherContainer.style.visibility = 'visible';
+        // Force reflow
+        weatherContainer.offsetHeight;
         weatherContainer.style.opacity = '1';
-      }, 100);
+      });
     } else {
       // Apply update animation if already visible
       weatherContainer.classList.add('weather-updated');
