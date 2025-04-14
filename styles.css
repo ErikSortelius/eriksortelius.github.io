@@ -17,6 +17,13 @@
   --red-300: #fca5a5;
   --neumorphic-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), -6px -6px 12px rgba(60, 60, 70, 0.1);
   --neumorphic-shadow-subtle: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(60, 60, 70, 0.1);
+
+  /* Accent color variables with low opacity for hover backgrounds */
+  --blue-accent-bg: rgba(147, 197, 253, 0.07);
+  --green-accent-bg: rgba(134, 239, 172, 0.07);
+  --orange-accent-bg: rgba(253, 186, 116, 0.07);
+  --purple-accent-bg: rgba(216, 180, 254, 0.07);
+  --red-accent-bg: rgba(252, 165, 165, 0.07);
 }
 
 * {
@@ -188,11 +195,54 @@ body {
   box-shadow: var(--neumorphic-shadow-subtle);
   border: 1px solid var(--border-color);
   transition: all 0.5s;
+  position: relative;
+  overflow: hidden;
+}
+
+.link-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  transition: background-color 0.5s ease;
+  z-index: 0;
+}
+
+.link-section > * {
+  position: relative;
+  z-index: 1;
 }
 
 .link-section:hover {
-  background-color: var(--bg-color-lighter);
   box-shadow: var(--neumorphic-shadow);
+}
+
+.link-section:hover::before {
+  background-color: var(--hover-color);
+}
+
+/* Color-specific hover effects */
+.link-section:has(.link-section-title.google):hover::before {
+  background-color: var(--blue-accent-bg);
+}
+
+.link-section:has(.link-section-title.work):hover::before {
+  background-color: var(--green-accent-bg);
+}
+
+.link-section:has(.link-section-title.fun):hover::before {
+  background-color: var(--orange-accent-bg);
+}
+
+.link-section:has(.link-section-title.ai):hover::before {
+  background-color: var(--purple-accent-bg);
+}
+
+.link-section:has(.link-section-title.art):hover::before {
+  background-color: var(--red-accent-bg);
 }
 
 .link-section-title {
