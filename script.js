@@ -720,8 +720,11 @@ function performEntranceAnimations() {
     if (timeElement) {
       const timeDigits = timeElement.querySelectorAll('span');
       timeDigits.forEach((digit, index) => {
-        // Set transition property immediately to ensure it's applied
+        // Apply transition properties first
         digit.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        
+        // Force reflow before queueing the animations
+        digit.offsetHeight;
         
         setTimeout(() => {
           digit.style.opacity = '1';
