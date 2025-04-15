@@ -662,12 +662,11 @@ function performEntranceAnimations() {
     const timeString = formatTime(now);
     timeElement.innerHTML = ''; // Clear any existing content
     
-    // Create digits with initial hidden state
+    // Create digits with visibility immediately (no animation)
     timeString.split('').forEach(digit => {
       const digitSpan = document.createElement('span');
       digitSpan.textContent = digit;
-      digitSpan.style.opacity = '0';
-      digitSpan.style.transform = 'translateY(20px)';
+      // No initial transforms or opacity changes - show immediately
       timeElement.appendChild(digitSpan);
     });
   }
@@ -716,22 +715,7 @@ function performEntranceAnimations() {
       activeIcon.style.transform = 'rotate(0deg)';
     }
     
-    // 3. Animate the time digits - starts immediately with 120ms stagger
-    if (timeElement) {
-      const timeDigits = timeElement.querySelectorAll('span');
-      timeDigits.forEach((digit, index) => {
-        // Apply transition properties first
-        digit.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-        
-        // Force reflow before queueing the animations
-        digit.offsetHeight;
-        
-        setTimeout(() => {
-          digit.style.opacity = '1';
-          digit.style.transform = 'translateY(0)';
-        }, index * 120); // Stagger each digit by 120ms
-      });
-    }
+    // No animation for clock digits - they're already visible
     
     // 4. Animate date elements - starts immediately with 120ms stagger
     if (dateElement) {
