@@ -89,9 +89,13 @@ const weekNumberElement = document.querySelector('.week-number');
 const sunIcon = document.getElementById('sunIcon');
 const moonIcon = document.getElementById('moonIcon');
 const dialRing = document.querySelector('.dial-ring');
+const dialMarker = document.querySelector('.dial-marker');
 const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
 const searchForm = document.getElementById('searchForm');
+
+// Animation state
+let initialAnimationComplete = false;
 
 // Weather elements
 const weatherContainer = document.querySelector('.weather-container');
@@ -442,12 +446,8 @@ function setupSearchInput() {
 
 // Weather functions
 function setupWeather() {
-  // Hide weather container initially
-  if (weatherContainer) {
-    weatherContainer.style.opacity = '0';
-    weatherContainer.style.visibility = 'hidden';
-  }
-
+  // Don't hide weather container here since we'll handle it in the animations
+  
   if (WEATHER_CONFIG.useGeolocation) {
     getUserLocation()
       .then(coords => {
@@ -463,9 +463,6 @@ function setupWeather() {
   } else {
     fetchWeatherData();
   }
-
-  // Remove automatic updates - only fetch on page load and manual click
-  // No more setInterval here
 
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
@@ -560,19 +557,14 @@ function displayWeatherData(data) {
       weatherConditionElement.textContent = description;
     }
 
-    // Fade in the weather container if it was hidden
-    if (weatherContainer &&
-      (weatherContainer.style.visibility === 'hidden' ||
-        parseFloat(weatherContainer.style.opacity) === 0)) {
-      // Use requestAnimationFrame instead of setTimeout for smoother animation
-      requestAnimationFrame(() => {
-        weatherContainer.style.visibility = 'visible';
-        // Force reflow
-        weatherContainer.offsetHeight;
-        weatherContainer.style.opacity = '1';
-      });
-    } else {
-      // Apply update animation if already visible
+    // Don't manipulate opacity here - let the entrance animation handle it
+    // for the initial load. Only handle visibility.
+    if (weatherContainer && weatherContainer.style.visibility === 'hidden') {
+      weatherContainer.style.visibility = 'visible';
+    } else if (!initialAnimationComplete && weatherContainer) {
+      // Don't interfere with the initial animation
+    } else if (weatherContainer) {
+      // If this is a refresh after initial load, add the update animation
       weatherContainer.classList.add('weather-updated');
       setTimeout(() => {
         weatherContainer.classList.remove('weather-updated');
@@ -584,12 +576,6 @@ function displayWeatherData(data) {
   } catch (error) {
     console.error('Error parsing weather data:', error);
     displayWeatherError();
-
-    // Still need to show the container even if there's an error
-    if (weatherContainer) {
-      weatherContainer.style.visibility = 'visible';
-      weatherContainer.style.opacity = '1';
-    }
   }
 }
 
@@ -641,26 +627,172 @@ function getCachedWeatherData() {
   }
 }
 
+// Clean and focused entrance animations
+function performEntranceAnimations() {
+  const now = new Date();
+  const isDay = checkIsDayTime(now);
+  const rotationAngle = getCurrentHourAngle();
+  
+  // Set initial states
+  if (dialRing) {
+    dialRing.style.transition = 'none';
+    dialRing.style.transform = 'rotate(0deg)';
+  }
+  
+  if (dialMarker) {
+    dialMarker.style.transition = 'none';
+    dialMarker.style.opacity = '0';
+    dialMarker.style.transform = 'translate(-50%, -50%) scale(0)';
+  }
+  
+  if (sunIcon) {
+    sunIcon.style.transition = 'none';
+    sunIcon.style.opacity = '0';
+    sunIcon.style.transform = `rotate(${isDay ? -120 : 0}deg)`;
+  }
+  
+  if (moonIcon) {
+    moonIcon.style.transition = 'none';
+    moonIcon.style.opacity = '0';
+    moonIcon.style.transform = `rotate(${isDay ? 0 : 120}deg)`;
+  }
+  
+  // Set initial state for time display
+  if (timeElement) {
+    const timeString = formatTime(now);
+    timeElement.innerHTML = ''; // Clear any existing content
+    
+    // Create digits with initial hidden state
+    timeString.split('').forEach(digit => {
+      const digitSpan = document.createElement('span');
+      digitSpan.textContent = digit;
+      digitSpan.style.opacity = '0';
+      digitSpan.style.transform = 'translateY(20px)';
+      timeElement.appendChild(digitSpan);
+    });
+  }
+  
+  // Set initial states for date elements
+  if (dateElement) {
+    dateElement.style.transition = 'none';
+    dateElement.style.opacity = '0';
+    dateElement.style.transform = 'translateY(20px)';
+  }
+  
+  if (weekdayElement) {
+    weekdayElement.style.transition = 'none';
+    weekdayElement.style.opacity = '0';
+    weekdayElement.style.transform = 'translateY(15px)';
+  }
+  
+  if (weekNumberElement) {
+    weekNumberElement.style.transition = 'none';
+    weekNumberElement.style.opacity = '0';
+  }
+  
+  if (weatherContainer) {
+    weatherContainer.style.transition = 'none';
+    weatherContainer.style.opacity = '0';
+    weatherContainer.style.transform = 'translateY(20px)';
+    weatherContainer.style.visibility = 'visible'; // Make sure it's visible for animation
+  }
+  
+  // Force browser reflow
+  document.body.offsetHeight;
+  
+  // Start animations with updated timing
+  requestAnimationFrame(() => {
+    // 1. Animate the dial ring - starts immediately, duration 1.8s
+    if (dialRing) {
+      dialRing.style.transition = 'transform 1.8s ease-out';
+      dialRing.style.transform = `rotate(${rotationAngle + 360}deg)`;
+    }
+    
+    // 2. Fade in and rotate the active icon - starts immediately, duration 1.0-1.2s
+    const activeIcon = isDay ? sunIcon : moonIcon;
+    if (activeIcon) {
+      activeIcon.style.transition = 'opacity 1s ease, transform 1.2s ease';
+      activeIcon.style.opacity = '1';
+      activeIcon.style.transform = 'rotate(0deg)';
+    }
+    
+    // 3. Animate the time digits - starts immediately with 120ms stagger
+    if (timeElement) {
+      const timeDigits = timeElement.querySelectorAll('span');
+      timeDigits.forEach((digit, index) => {
+        // Set transition property immediately to ensure it's applied
+        digit.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        
+        setTimeout(() => {
+          digit.style.opacity = '1';
+          digit.style.transform = 'translateY(0)';
+        }, index * 120); // Stagger each digit by 120ms
+      });
+    }
+    
+    // 4. Animate date elements - starts immediately with 120ms stagger
+    if (dateElement) {
+      dateElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      dateElement.style.opacity = '1';
+      dateElement.style.transform = 'translateY(0)';
+    }
+    
+    setTimeout(() => {
+      if (weekdayElement) {
+        weekdayElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        weekdayElement.style.opacity = '1';
+        weekdayElement.style.transform = 'translateY(0)';
+      }
+    }, 120); // 120ms stagger
+    
+    setTimeout(() => {
+      if (weekNumberElement) {
+        weekNumberElement.style.transition = 'opacity 0.8s ease';
+        weekNumberElement.style.opacity = '1';
+      }
+    }, 240); // 120ms stagger after weekday (2 x 120ms)
+    
+    // 5. Weather elements - starts immediately
+    if (weatherContainer) {
+      weatherContainer.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      weatherContainer.style.opacity = '1';
+      weatherContainer.style.transform = 'translateY(0)';
+    }
+    
+    // 6. Animate the marker dot - delayed start after 1200ms
+    setTimeout(() => {
+      if (dialMarker) {
+        dialMarker.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        dialMarker.style.opacity = '1';
+        dialMarker.style.transform = 'translate(-50%, -50%) scale(1)';
+      }
+    }, 1200);
+  });
+  
+  // Mark animation as complete after all animations have finished
+  // Using the longest duration (dial + marker dot) to ensure all animations are done
+  setTimeout(() => {
+    initialAnimationComplete = true;
+  }, 2000);
+}
+
 // Initialize the page
 function init() {
-  // Hide icons during initialization to prevent flash
-  if (sunIcon) sunIcon.style.opacity = 0;
-  if (moonIcon) moonIcon.style.opacity = 0;
-
-  // Initial clock update
-  updateClock();
-
-  // Set up clock interval - update every second
-  setInterval(updateClock, 1000);
-
-  // Create link sections
+  // Create link sections and setup search input first
   createLinkSections();
-
-  // Setup search input
   setupSearchInput();
-
+  
+  // Perform entrance animations
+  performEntranceAnimations();
+  
   // Setup weather
   setupWeather();
+  
+  // Set up clock updates after animations begin
+  setTimeout(() => {
+    updateClock();
+    setInterval(updateClock, 1000);
+  }, 100);
 }
 
 // Run initialization when page loads
