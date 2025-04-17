@@ -461,12 +461,6 @@ function createHiddenSection() {
   hiddenSectionContainer = document.createElement('div');
   hiddenSectionContainer.className = 'hidden-section';
   
-  // Create toggle button
-  toggleHiddenSectionButton = document.createElement('button');
-  toggleHiddenSectionButton.className = 'toggle-hidden-section';
-  toggleHiddenSectionButton.setAttribute('aria-label', 'Toggle hidden section');
-  toggleHiddenSectionButton.innerHTML = icons['chevron-right'];
-  
   // Create the hidden section content
   hiddenCategories.forEach(category => {
     const section = document.createElement('div');
@@ -505,16 +499,35 @@ function createHiddenSection() {
     hiddenSectionContainer.appendChild(section);
   });
   
+  // Create toggle button
+  toggleHiddenSectionButton = document.createElement('button');
+  toggleHiddenSectionButton.className = 'toggle-hidden-section';
+  toggleHiddenSectionButton.setAttribute('aria-label', 'Toggle trackers section');
+  toggleHiddenSectionButton.innerHTML = icons['chevron-right'];
+  
   // Create a wrapper div to contain both the button and hidden section
   const hiddenSectionWrapper = document.createElement('div');
   hiddenSectionWrapper.className = 'hidden-section-wrapper';
   
-  // Add the toggle button and hidden section to the wrapper
+  // Apply the same initial animation styles as regular sections
+  hiddenSectionWrapper.style.opacity = '0';
+  hiddenSectionWrapper.style.transform = 'translateY(20px)';
+  
+  // Add the hidden section and toggle button to the wrapper
   hiddenSectionWrapper.appendChild(hiddenSectionContainer);
   hiddenSectionWrapper.appendChild(toggleHiddenSectionButton);
   
-  // Add wrapper directly to the links container in the same row as other sections
+  // Add wrapper to the links container
   linksContainer.appendChild(hiddenSectionWrapper);
+  
+  // Animate with the same staggered delay pattern as other sections
+  setTimeout(() => {
+    requestAnimationFrame(() => {
+      hiddenSectionWrapper.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+      hiddenSectionWrapper.style.opacity = '1';
+      hiddenSectionWrapper.style.transform = 'translateY(0)';
+    });
+  }, 100 * categories.length); // Continue the stagger pattern after regular sections
   
   // Set up toggle functionality
   setupHiddenSectionToggle();
