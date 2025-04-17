@@ -504,11 +504,17 @@ function createHiddenSection() {
     hiddenSectionContainer.appendChild(section);
   });
   
-  // Add toggle button to hidden section container
-  hiddenSectionContainer.appendChild(toggleHiddenSectionButton);
+  // Create a wrapper div to contain both the button and hidden section
+  const hiddenSectionWrapper = document.createElement('div');
+  hiddenSectionWrapper.className = 'hidden-section-wrapper';
+  hiddenSectionWrapper.style.position = 'relative';
   
-  // Add hidden section to links container
-  linksContainer.appendChild(hiddenSectionContainer);
+  // Add the toggle button and hidden section to the wrapper
+  hiddenSectionWrapper.appendChild(toggleHiddenSectionButton);
+  hiddenSectionWrapper.appendChild(hiddenSectionContainer);
+  
+  // Add wrapper to links container
+  linksContainer.appendChild(hiddenSectionWrapper);
   
   // Set up toggle functionality
   setupHiddenSectionToggle();

@@ -411,13 +411,18 @@ body {
 }
 
 /* Hidden Trackers section */
+.hidden-section-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .hidden-section {
   display: flex;
   opacity: 0;
   transform: translateX(30px);
   pointer-events: none;
   transition: opacity 0.5s ease, transform 0.5s ease;
-  position: relative;
 }
 
 .hidden-section.visible {
@@ -430,7 +435,7 @@ body {
 .toggle-hidden-section {
   position: absolute;
   top: 50%;
-  left: -20px;
+  right: calc(100% + 8px);
   transform: translateY(-50%);
   width: 24px;
   height: 24px;
@@ -444,7 +449,7 @@ body {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
-  opacity: 0.3;
+  opacity: 0.7; 
 }
 
 .toggle-hidden-section:hover {
@@ -671,6 +676,7 @@ body {
   
   .toggle-hidden-section {
     top: -12px;
+    right: auto;
     left: 50%;
     transform: translateX(-50%);
   }
