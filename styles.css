@@ -276,13 +276,15 @@ body {
 /* Links container */
 .links-container {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap; /* Changed from wrap to nowrap to keep everything in one row */
   gap: 1rem;
   justify-content: center;
   width: 100%;
   max-width: 48rem; /* Match the max-width of other containers */
   margin-left: auto;
   margin-right: auto;
+  overflow-x: auto; /* Allow horizontal scrolling if needed */
+  padding-bottom: 0.5rem; /* Add space for scrollbar */
 }
 
 /* Link section */
@@ -290,9 +292,9 @@ body {
   background-color: var(--bg-color-light);
   border-radius: 0.75rem;
   padding: 1.25rem;
-  flex: 1 1 0;
-  min-width: 200px;
-  max-width: 280px;
+  flex: 0 0 auto; /* Changed from 1 1 0 to ensure fixed size */
+  width: 220px; /* Fixed width for all sections */
+  height: 220px; /* Fixed height for all sections */
   box-shadow: var(--neumorphic-shadow-subtle);
   border: 1px solid var(--border-color);
   transition: all 0.5s;
@@ -418,9 +420,9 @@ body {
 .hidden-section-wrapper {
   position: relative;
   display: flex;
-  flex: 1 1 0;
-  min-width: 200px;
-  max-width: 280px;
+  flex: 0 0 auto; /* Match the link-section flex property */
+  width: 220px; /* Fixed width matching link sections */
+  height: 220px; /* Fixed height matching link sections */
 }
 
 .hidden-section {
@@ -430,6 +432,13 @@ body {
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.3s ease;
   width: 100%;
+  height: 100%;
+}
+
+.hidden-section .link-section {
+  width: 100%;
+  height: 100%;
+  margin: 0;
 }
 
 .hidden-section.visible {
@@ -456,7 +465,7 @@ body {
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 10;
-  opacity: 0.8; 
+  opacity: 0.5; /* Increased transparency when not hovered */
 }
 
 .toggle-hidden-section:hover {
@@ -492,11 +501,11 @@ body {
   width: 14px;
   height: 14px;
   transition: transform 0.3s ease;
-  transform: rotate(180deg);
+  transform: rotate(0deg); /* Inverted from 180deg to 0deg */
 }
 
 .toggle-hidden-section.visible svg {
-  transform: rotate(0deg);
+  transform: rotate(180deg); /* Inverted from 0deg to 180deg */
 }
 
 /* Weather styles */
@@ -697,25 +706,35 @@ body {
     width: 80%;
   }
 
+  .links-container {
+    justify-content: flex-start; /* Left align on mobile for better scrolling */
+    padding-bottom: 1rem; /* More space for scrollbar on mobile */
+  }
+
+  .link-section,
+  .hidden-section-wrapper {
+    /* Keep the same fixed dimensions */
+  }
+
   .hidden-section {
-    transform: translateY(-20px);
+    transform: translateX(-15px);
   }
   
   .hidden-section.visible {
-    transform: translateY(0);
+    transform: translateX(0);
   }
   
   .toggle-hidden-section {
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
+    top: 50%;
+    left: -12px;
+    transform: translateY(-50%);
   }
   
   .toggle-hidden-section svg {
-    transform: rotate(-90deg);
+    transform: rotate(0deg);
   }
   
   .toggle-hidden-section.visible svg {
-    transform: rotate(90deg);
+    transform: rotate(180deg);
   }
 }
