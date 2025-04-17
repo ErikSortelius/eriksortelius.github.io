@@ -15,6 +15,7 @@
   --orange-300: #fdba74;
   --purple-300: #d8b4fe;
   --red-300: #fca5a5;
+  --teal-300: #5eead4;
   --neumorphic-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), -6px -6px 12px rgba(60, 60, 70, 0.1);
   --neumorphic-shadow-subtle: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(60, 60, 70, 0.1);
 
@@ -24,6 +25,7 @@
   --orange-accent-bg: rgba(253, 186, 116, 0.07);
   --purple-accent-bg: rgba(216, 180, 254, 0.07);
   --red-accent-bg: rgba(252, 165, 165, 0.07);
+  --teal-accent-bg: rgba(94, 234, 212, 0.07);
 }
 
 * {
@@ -340,6 +342,10 @@ body {
   background-color: var(--red-accent-bg);
 }
 
+.link-section:has(.link-section-title.trackers):hover::before {
+  background-color: var(--teal-accent-bg);
+}
+
 .link-section-title {
   font-size: 1.125rem;
   font-weight: 500;
@@ -367,6 +373,10 @@ body {
 
 .link-section:hover .link-section-title.art {
   color: var(--red-300);
+}
+
+.link-section:hover .link-section-title.trackers {
+  color: var(--teal-300);
 }
 
 .link-list {
@@ -398,6 +408,59 @@ body {
   color: var(--text-color-dim);
   width: 1rem;
   height: 1rem;
+}
+
+/* Hidden Trackers section */
+.hidden-section {
+  display: flex;
+  opacity: 0;
+  transform: translateX(30px);
+  pointer-events: none;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  position: relative;
+}
+
+.hidden-section.visible {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+/* Toggle button for hidden section */
+.toggle-hidden-section {
+  position: absolute;
+  top: 50%;
+  left: -20px;
+  transform: translateY(-50%);
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background-color: rgba(60, 60, 70, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  color: var(--text-color-dim);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 10;
+  opacity: 0.3;
+}
+
+.toggle-hidden-section:hover {
+  background-color: rgba(94, 234, 212, 0.2);
+  color: var(--teal-300);
+  opacity: 1;
+}
+
+.toggle-hidden-section svg {
+  width: 14px;
+  height: 14px;
+  transition: transform 0.3s ease;
+}
+
+.toggle-hidden-section.visible svg {
+  transform: rotate(-180deg);
 }
 
 /* Weather styles */
@@ -596,5 +659,27 @@ body {
 
   .search-input-wrapper {
     width: 80%;
+  }
+
+  .hidden-section {
+    transform: translateY(20px);
+  }
+  
+  .hidden-section.visible {
+    transform: translateY(0);
+  }
+  
+  .toggle-hidden-section {
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  
+  .toggle-hidden-section svg {
+    transform: rotate(90deg);
+  }
+  
+  .toggle-hidden-section.visible svg {
+    transform: rotate(-90deg);
   }
 }

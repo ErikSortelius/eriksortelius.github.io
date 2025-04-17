@@ -23,8 +23,7 @@ const categories = [
     links: [
       { name: "GitHub", url: "https://github.com", icon: "github" },
       { name: "Reddit", url: "https://reddit.com", icon: "message-circle" },
-      { name: "Wallhaven", url: "https://wallhaven.cc", icon: "image" },
-      { name: "Fitgirl", url: "https://fitgirl-repacks.site", icon: "download" }
+      { name: "Wallhaven", url: "https://wallhaven.cc", icon: "image" }
     ]
   },
   {
@@ -41,6 +40,18 @@ const categories = [
       { name: "Cine2nerdle", url: "https://cine2nerdle.com", icon: "film" },
       { name: "Letterboxd", url: "https://letterboxd.com", icon: "clapperboard" },
       { name: "Plex", url: "https://app.plex.tv", icon: "tv" }
+    ]
+  }
+];
+
+// Hidden tracker section
+const hiddenCategories = [
+  {
+    name: "Trackers",
+    links: [
+      { name: "RuTracker", url: "https://rutracker.org/forum/index.php", icon: "database" },
+      { name: "1337x", url: "https://x1337x.eu/", icon: "database" },
+      { name: "Fitgirl", url: "https://fitgirl-repacks.site", icon: "download" }
     ]
   }
 ];
@@ -67,6 +78,9 @@ const icons = {
   clapperboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8H4Z"></path><path d="m4 11-.88-2.87a2 2 0 0 1 1.33-2.5l11.48-3.5a2 2 0 0 1 2.5 1.33l.87 2.87L4 11.01Z"></path><path d="m6.6 4.99 3.38 4.2"></path><path d="m11.86 3.38 3.38 4.2"></path></svg>`,
   tv: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>`,
   search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
+  database: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
+  "eye-off": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`,
+  "chevron-right": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
   // Weather Icons
   "cloud": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`,
   "cloud-rain": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>`,
@@ -93,6 +107,8 @@ const dialMarker = document.querySelector('.dial-marker');
 const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
 const searchForm = document.getElementById('searchForm');
+let hiddenSectionContainer = null;
+let toggleHiddenSectionButton = null;
 
 // Animation state
 let initialAnimationComplete = false;
@@ -383,6 +399,7 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
 
 // Create link sections
 function createLinkSections() {
+  // Create regular link sections first
   categories.forEach((category, index) => {
     const section = document.createElement('div');
     section.className = 'link-section';
@@ -431,6 +448,96 @@ function createLinkSections() {
         section.style.transform = 'translateY(0)';
       });
     }, 100 * index); // Stagger the animations
+  });
+  
+  // Create hidden section wrapper
+  createHiddenSection();
+}
+
+// Create hidden section with toggle button
+function createHiddenSection() {
+  // Create container for hidden sections
+  hiddenSectionContainer = document.createElement('div');
+  hiddenSectionContainer.className = 'hidden-section';
+  
+  // Create toggle button
+  toggleHiddenSectionButton = document.createElement('button');
+  toggleHiddenSectionButton.className = 'toggle-hidden-section';
+  toggleHiddenSectionButton.setAttribute('aria-label', 'Toggle hidden section');
+  toggleHiddenSectionButton.innerHTML = icons['chevron-right'];
+  
+  // Create the hidden section content
+  hiddenCategories.forEach(category => {
+    const section = document.createElement('div');
+    section.className = 'link-section';
+    
+    const title = document.createElement('h2');
+    title.className = `link-section-title ${category.name.toLowerCase()}`;
+    title.textContent = category.name;
+    
+    const linkList = document.createElement('ul');
+    linkList.className = 'link-list';
+    
+    category.links.forEach(link => {
+      const linkItem = document.createElement('li');
+      linkItem.className = 'link-item';
+      
+      const linkElement = document.createElement('a');
+      linkElement.className = 'link';
+      linkElement.href = link.url;
+      
+      const iconSpan = document.createElement('span');
+      iconSpan.className = 'link-icon';
+      iconSpan.innerHTML = icons[link.icon] || icons.bookmark;
+      
+      const linkText = document.createElement('span');
+      linkText.textContent = link.name;
+      
+      linkElement.appendChild(iconSpan);
+      linkElement.appendChild(linkText);
+      linkItem.appendChild(linkElement);
+      linkList.appendChild(linkItem);
+    });
+    
+    section.appendChild(title);
+    section.appendChild(linkList);
+    hiddenSectionContainer.appendChild(section);
+  });
+  
+  // Add toggle button to hidden section container
+  hiddenSectionContainer.appendChild(toggleHiddenSectionButton);
+  
+  // Add hidden section to links container
+  linksContainer.appendChild(hiddenSectionContainer);
+  
+  // Set up toggle functionality
+  setupHiddenSectionToggle();
+}
+
+// Setup toggle functionality for hidden section
+function setupHiddenSectionToggle() {
+  // Check if toggle preference exists in localStorage
+  const isVisible = localStorage.getItem('hiddenSectionVisible') === 'true';
+  
+  // Set initial state
+  if (isVisible) {
+    hiddenSectionContainer.classList.add('visible');
+    toggleHiddenSectionButton.classList.add('visible');
+  }
+  
+  // Add click event listener
+  toggleHiddenSectionButton.addEventListener('click', () => {
+    const isCurrentlyVisible = hiddenSectionContainer.classList.contains('visible');
+    
+    if (isCurrentlyVisible) {
+      hiddenSectionContainer.classList.remove('visible');
+      toggleHiddenSectionButton.classList.remove('visible');
+      localStorage.setItem('hiddenSectionVisible', 'false');
+    } else {
+      hiddenSectionContainer.classList.add('visible');
+      toggleHiddenSectionButton.classList.add('visible');
+      localStorage.setItem('hiddenSectionVisible', 'true');
+    }
   });
 }
 
