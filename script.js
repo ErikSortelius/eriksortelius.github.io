@@ -44,18 +44,6 @@ const categories = [
   }
 ];
 
-// Hidden tracker section
-const hiddenCategories = [
-  {
-    name: "Trackers",
-    links: [
-      { name: "RuTracker", url: "https://rutracker.org/forum/index.php", icon: "database" },
-      { name: "1337x", url: "https://x1337x.eu/", icon: "download-cloud" },
-      { name: "Fitgirl", url: "https://fitgirl-repacks.site", icon: "download" }
-    ]
-  }
-];
-
 // Icon mappings - Simple SVG icons based on Lucide icons
 const icons = {
   // Used icons only
@@ -108,8 +96,6 @@ const dialMarker = document.querySelector('.dial-marker');
 const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
 const searchForm = document.getElementById('searchForm');
-let hiddenSectionContainer = null;
-let toggleHiddenSectionButton = null;
 
 // Animation state
 let initialAnimationComplete = false;
@@ -449,114 +435,6 @@ function createLinkSections() {
         section.style.transform = 'translateY(0)';
       });
     }, 100 * index); // Stagger the animations
-  });
-  
-  // Create hidden section wrapper
-  createHiddenSection();
-}
-
-// Create hidden section with toggle button
-function createHiddenSection() {
-  // Create container for hidden sections
-  hiddenSectionContainer = document.createElement('div');
-  hiddenSectionContainer.className = 'hidden-section';
-  
-  // Create the hidden section content
-  hiddenCategories.forEach(category => {
-    const section = document.createElement('div');
-    section.className = 'link-section';
-    
-    const title = document.createElement('h2');
-    title.className = `link-section-title ${category.name.toLowerCase()}`;
-    title.textContent = category.name;
-    
-    const linkList = document.createElement('ul');
-    linkList.className = 'link-list';
-    
-    category.links.forEach(link => {
-      const linkItem = document.createElement('li');
-      linkItem.className = 'link-item';
-      
-      const linkElement = document.createElement('a');
-      linkElement.className = 'link';
-      linkElement.href = link.url;
-      
-      const iconSpan = document.createElement('span');
-      iconSpan.className = 'link-icon';
-      iconSpan.innerHTML = icons[link.icon] || icons.bookmark;
-      
-      const linkText = document.createElement('span');
-      linkText.textContent = link.name;
-      
-      linkElement.appendChild(iconSpan);
-      linkElement.appendChild(linkText);
-      linkItem.appendChild(linkElement);
-      linkList.appendChild(linkItem);
-    });
-    
-    section.appendChild(title);
-    section.appendChild(linkList);
-    hiddenSectionContainer.appendChild(section);
-  });
-  
-  // Create toggle button
-  toggleHiddenSectionButton = document.createElement('button');
-  toggleHiddenSectionButton.className = 'toggle-hidden-section';
-  toggleHiddenSectionButton.setAttribute('aria-label', 'Toggle trackers section');
-  toggleHiddenSectionButton.innerHTML = icons['chevron-right'];
-  
-  // Create a wrapper div to contain both the button and hidden section
-  const hiddenSectionWrapper = document.createElement('div');
-  hiddenSectionWrapper.className = 'hidden-section-wrapper';
-  
-  // Apply the same initial animation styles as regular sections
-  hiddenSectionWrapper.style.opacity = '0';
-  hiddenSectionWrapper.style.transform = 'translateY(20px)';
-  
-  // Add the hidden section and toggle button to the wrapper
-  hiddenSectionWrapper.appendChild(hiddenSectionContainer);
-  hiddenSectionWrapper.appendChild(toggleHiddenSectionButton);
-  
-  // Add wrapper to the links container
-  linksContainer.appendChild(hiddenSectionWrapper);
-  
-  // Animate with the same staggered delay pattern as other sections
-  setTimeout(() => {
-    requestAnimationFrame(() => {
-      hiddenSectionWrapper.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-      hiddenSectionWrapper.style.opacity = '1';
-      hiddenSectionWrapper.style.transform = 'translateY(0)';
-    });
-  }, 100 * categories.length); // Continue the stagger pattern after regular sections
-  
-  // Set up toggle functionality
-  setupHiddenSectionToggle();
-}
-
-// Setup toggle functionality for hidden section
-function setupHiddenSectionToggle() {
-  // Check if toggle preference exists in localStorage
-  const isVisible = localStorage.getItem('hiddenSectionVisible') === 'true';
-  
-  // Set initial state
-  if (isVisible) {
-    hiddenSectionContainer.classList.add('visible');
-    toggleHiddenSectionButton.classList.add('visible');
-  }
-  
-  // Add click event listener
-  toggleHiddenSectionButton.addEventListener('click', () => {
-    const isCurrentlyVisible = hiddenSectionContainer.classList.contains('visible');
-    
-    if (isCurrentlyVisible) {
-      hiddenSectionContainer.classList.remove('visible');
-      toggleHiddenSectionButton.classList.remove('visible');
-      localStorage.setItem('hiddenSectionVisible', 'false');
-    } else {
-      hiddenSectionContainer.classList.add('visible');
-      toggleHiddenSectionButton.classList.add('visible');
-      localStorage.setItem('hiddenSectionVisible', 'true');
-    }
   });
 }
 
