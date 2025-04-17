@@ -50,7 +50,7 @@ const hiddenCategories = [
     name: "Trackers",
     links: [
       { name: "RuTracker", url: "https://rutracker.org/forum/index.php", icon: "database" },
-      { name: "1337x", url: "https://x1337x.eu/", icon: "database" },
+      { name: "1337x", url: "https://x1337x.eu/", icon: "download-cloud" },
       { name: "Fitgirl", url: "https://fitgirl-repacks.site", icon: "download" }
     ]
   }
@@ -81,6 +81,7 @@ const icons = {
   database: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
   "eye-off": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`,
   "chevron-right": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
+  "download-cloud": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>`,
   // Weather Icons
   "cloud": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`,
   "cloud-rain": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>`,
@@ -507,13 +508,12 @@ function createHiddenSection() {
   // Create a wrapper div to contain both the button and hidden section
   const hiddenSectionWrapper = document.createElement('div');
   hiddenSectionWrapper.className = 'hidden-section-wrapper';
-  hiddenSectionWrapper.style.position = 'relative';
   
   // Add the toggle button and hidden section to the wrapper
-  hiddenSectionWrapper.appendChild(toggleHiddenSectionButton);
   hiddenSectionWrapper.appendChild(hiddenSectionContainer);
+  hiddenSectionWrapper.appendChild(toggleHiddenSectionButton);
   
-  // Add wrapper to links container
+  // Add wrapper directly to the links container in the same row as other sections
   linksContainer.appendChild(hiddenSectionWrapper);
   
   // Set up toggle functionality

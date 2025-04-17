@@ -414,15 +414,18 @@ body {
 .hidden-section-wrapper {
   position: relative;
   display: flex;
-  justify-content: flex-end;
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
 }
 
 .hidden-section {
   display: flex;
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateX(-30px);
   pointer-events: none;
   transition: opacity 0.5s ease, transform 0.5s ease;
+  width: 100%;
 }
 
 .hidden-section.visible {
@@ -435,7 +438,7 @@ body {
 .toggle-hidden-section {
   position: absolute;
   top: 50%;
-  right: calc(100% + 8px);
+  left: -12px;
   transform: translateY(-50%);
   width: 24px;
   height: 24px;
@@ -456,16 +459,41 @@ body {
   background-color: rgba(94, 234, 212, 0.2);
   color: var(--teal-300);
   opacity: 1;
+  box-shadow: 0 0 8px rgba(94, 234, 212, 0.3);
+}
+
+.toggle-hidden-section::before {
+  content: "Toggle trackers";
+  position: absolute;
+  bottom: -2.5rem;
+  left: 50%;
+  transform: translateX(-50%) translateY(0.5rem);
+  background-color: var(--bg-color-lighter);
+  color: var(--text-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 10;
+}
+
+.toggle-hidden-section:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
 
 .toggle-hidden-section svg {
   width: 14px;
   height: 14px;
   transition: transform 0.3s ease;
+  transform: rotate(180deg);
 }
 
 .toggle-hidden-section.visible svg {
-  transform: rotate(-180deg);
+  transform: rotate(0deg);
 }
 
 /* Weather styles */
@@ -667,7 +695,7 @@ body {
   }
 
   .hidden-section {
-    transform: translateY(20px);
+    transform: translateY(-20px);
   }
   
   .hidden-section.visible {
@@ -676,16 +704,15 @@ body {
   
   .toggle-hidden-section {
     top: -12px;
-    right: auto;
     left: 50%;
     transform: translateX(-50%);
   }
   
   .toggle-hidden-section svg {
-    transform: rotate(90deg);
+    transform: rotate(-90deg);
   }
   
   .toggle-hidden-section.visible svg {
-    transform: rotate(-90deg);
+    transform: rotate(90deg);
   }
 }
