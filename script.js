@@ -454,7 +454,7 @@ function setupWeather() {
     // Show placeholder if no cache
     if (weatherIcon) weatherIcon.innerHTML = icons['cloud'];
     if (temperatureElement) temperatureElement.textContent = '--°';
-    if (feelsLikeElement) feelsLikeElement.textContent = 'Feels: --°';
+    if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
     if (weatherConditionElement) weatherConditionElement.textContent = 'Loading...';
   }
   
@@ -552,6 +552,68 @@ function fetchWeatherData(forceRefresh = false, quietMode = false) {
     });
 }
 
+// New function to set temperature gradient
+function setTemperatureGradient(temperature) {
+  if (!weatherIcon) return;
+  
+  // Updated temperature ranges
+  // Freezing: below 0°C
+  // Cold: 0°C to 10°C
+  // Mild: 10°C to 20°C
+  // Warm: 20°C to 28°C
+  // Hot: 28°C to 32°C
+  // Very Hot: 32°C to 39°C
+  // Scorching: above 39°C
+  
+  let color;
+  let gradient;
+  
+  if (temperature < 0) {
+    gradient = 'linear-gradient(135deg, var(--temp-freezing-1), var(--temp-freezing-2))';
+    color = 'var(--blue-300)';
+  } else if (temperature < 10) {
+    gradient = 'linear-gradient(135deg, var(--temp-cold-1), var(--temp-cold-2))';
+    color = 'var(--blue-300)';
+  } else if (temperature < 20) {
+    gradient = 'linear-gradient(135deg, var(--temp-mild-1), var(--temp-mild-2))';
+    color = 'var(--green-300)';
+  } else if (temperature < 28) {
+    gradient = 'linear-gradient(135deg, var(--temp-warm-1), var(--temp-warm-2))';
+    color = 'var(--amber-300)';
+  } else if (temperature < 32) {
+    gradient = 'linear-gradient(135deg, var(--temp-hot-1), var(--temp-hot-2))';
+    color = 'var(--orange-300)';
+  } else if (temperature < 39) {
+    gradient = 'linear-gradient(135deg, var(--temp-very-hot-1), var(--temp-very-hot-2))';
+    color = 'var(--red-300)';
+  } else {
+    gradient = 'linear-gradient(135deg, var(--temp-scorching-1), var(--temp-scorching-2))';
+    color = 'var(--purple-300)'; // Using purple for scorching temperatures
+  }
+  
+  // Set the icon color
+  weatherIcon.style.color = color;
+  
+  // Also set the temperature text color to match
+  if (temperatureElement) {
+    temperatureElement.style.color = color;
+  }
+  
+  // Apply the gradient to the ::after pseudo-element
+  const styleElem = document.createElement('style');
+  styleElem.textContent = `.weather-icon::after { background: ${gradient}; }`;
+  
+  // Remove any previous custom styles
+  const oldStyle = document.getElementById('weather-gradient-style');
+  if (oldStyle) {
+    oldStyle.remove();
+  }
+  
+  // Add the new style
+  styleElem.id = 'weather-gradient-style';
+  document.head.appendChild(styleElem);
+}
+
 function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
   try {
     // Get icon from mapping or use cloud as fallback
@@ -570,8 +632,11 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
     if (temperatureElement) temperatureElement.textContent = `${temperature}°`;
     if (feelsLikeElement) {
-      feelsLikeElement.textContent = `Feels: ${feelsLike}°`;
+      feelsLikeElement.textContent = `Realfeel: ${feelsLike}°`;
     }
+    
+    // Set the temperature gradient based on "feels like" temperature
+    setTemperatureGradient(feelsLike);
     
     if (weatherConditionElement) {
       // Capitalize first letter of each word
@@ -608,9 +673,29 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
 }
 
 function displayWeatherError() {
-  if (weatherIcon) weatherIcon.innerHTML = icons['cloud'];
+  if (weatherIcon) {
+    weatherIcon.innerHTML = icons['cloud'];
+    const styleElem = document.createElement('style');
+    styleElem.textContent = `.weather-icon::after { background: linear-gradient(135deg, var(--temp-mild-1), var(--temp-mild-2)); }`;
+    styleElem.id = 'weather-gradient-style';
+    
+    const oldStyle = document.getElementById('weather-gradient-style');
+    if (oldStyle) {
+      oldStyle.remove();
+    }
+    
+    document.head.appendChild(styleElem);
+    
+    // Set icon and temperature text color
+    const color = 'var(--text-color-dim)';
+    weatherIcon.style.color = color;
+    if (temperatureElement) {
+      temperatureElement.style.color = color;
+    }
+  }
+  
   if (temperatureElement) temperatureElement.textContent = '--°';
-  if (feelsLikeElement) feelsLikeElement.textContent = 'Feels: --°';
+  if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
   if (weatherConditionElement) weatherConditionElement.textContent = 'Weather Unavailable';
   if (locationElement) locationElement.textContent = 'Try again later';
   if (sunriseElement) {

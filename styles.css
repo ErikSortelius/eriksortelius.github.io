@@ -24,6 +24,22 @@
   --orange-accent-bg: rgba(253, 186, 116, 0.07);
   --purple-accent-bg: rgba(216, 180, 254, 0.07);
   --red-accent-bg: rgba(252, 165, 165, 0.07);
+
+  /* Temperature gradient colors */
+  --temp-freezing-1: rgba(176, 219, 255, 0.2);
+  --temp-freezing-2: rgba(134, 203, 255, 0.2);
+  --temp-cold-1: rgba(134, 203, 255, 0.2);
+  --temp-cold-2: rgba(172, 235, 223, 0.2);
+  --temp-mild-1: rgba(172, 235, 223, 0.2);
+  --temp-mild-2: rgba(184, 227, 146, 0.2);
+  --temp-warm-1: rgba(184, 227, 146, 0.2);
+  --temp-warm-2: rgba(255, 222, 125, 0.2);
+  --temp-hot-1: rgba(255, 222, 125, 0.2);
+  --temp-hot-2: rgba(255, 179, 107, 0.2);
+  --temp-very-hot-1: rgba(255, 179, 107, 0.2);
+  --temp-very-hot-2: rgba(255, 155, 155, 0.2);
+  --temp-scorching-1: rgba(255, 155, 155, 0.2);
+  --temp-scorching-2: rgba(255, 105, 180, 0.2);
 }
 
 * {
@@ -426,7 +442,7 @@ body {
   height: 5rem;
   margin-right: 1rem;
   color: var(--blue-300);
-  transition: transform 0.3s ease, opacity 0.2s ease, color 0.3s ease, background-color 0.3s ease;
+  transition: transform 0.3s ease, opacity 0.2s ease, color 0.3s ease;
   cursor: pointer;
   border-radius: 50%;
   padding: 0.5rem;
@@ -463,22 +479,13 @@ body {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  background-color: var(--blue-accent-bg);
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: -1;
 }
 
-.weather-icon:hover {
-  transform: scale(1.05);
-}
-
 .weather-icon:hover::after {
   opacity: 1;
-}
-
-.weather-icon:active {
-  transform: scale(0.95);
 }
 
 .weather-updated .weather-icon {
