@@ -23,7 +23,8 @@ const categories = [
     links: [
       { name: "GitHub", url: "https://github.com", icon: "github" },
       { name: "Reddit", url: "https://reddit.com", icon: "message-circle" },
-      { name: "Wallhaven", url: "https://wallhaven.cc", icon: "image" }
+      { name: "Wallhaven", url: "https://wallhaven.cc", icon: "image" },
+      { name: "Fitgirl", url: "https://fitgirl-repacks.site", icon: "download" }
     ]
   },
   {
@@ -31,7 +32,7 @@ const categories = [
     links: [
       { name: "ChatGPT", url: "https://chat.openai.com", icon: "message-square" },
       { name: "v0", url: "https://v0.dev", icon: "bot" },
-      { name: "Google Studio", url: "https://studio.google.com", icon: "brain-circuit" }
+      { name: "Google Studio", url: "https://aistudio.google.com/app/prompts/new_chat", icon: "brain-circuit" }
     ]
   },
   {
@@ -66,10 +67,6 @@ const icons = {
   clapperboard: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8H4Z"></path><path d="m4 11-.88-2.87a2 2 0 0 1 1.33-2.5l11.48-3.5a2 2 0 0 1 2.5 1.33l.87 2.87L4 11.01Z"></path><path d="m6.6 4.99 3.38 4.2"></path><path d="m11.86 3.38 3.38 4.2"></path></svg>`,
   tv: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect><polyline points="17 2 12 7 7 2"></polyline></svg>`,
   search: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>`,
-  database: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>`,
-  "eye-off": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"></path><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"></path><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>`,
-  "chevron-right": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>`,
-  "download-cloud": `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M12 12v9"></path><path d="m8 17 4 4 4-4"></path></svg>`,
   // Weather Icons
   "cloud": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>`,
   "cloud-rain": `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242"></path><path d="M16 14v6"></path><path d="M8 14v6"></path><path d="M12 16v6"></path></svg>`,
@@ -116,7 +113,7 @@ const WEATHER_CONFIG = {
   lat: 59.3194903,  // Default coordinates (Stockholm)
   lon: 18.075060000000007,
   units: "metric",
-  cacheTimeMs: 30 * 60 * 1000, // Cache weather data for 30 minutes
+  cacheTimeMs: 4 * 60 * 60 * 1000, // Cache weather data for 4 hours instead of 30 minutes
   useGeolocation: true  // Set to true to enable geolocation
 };
 
@@ -386,7 +383,6 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
 
 // Create link sections
 function createLinkSections() {
-  // Create regular link sections first
   categories.forEach((category, index) => {
     const section = document.createElement('div');
     section.className = 'link-section';
@@ -450,23 +446,40 @@ function setupSearchInput() {
 
 // Weather functions
 function setupWeather() {
-  // Don't hide weather container here since we'll handle it in the animations
-  
-  if (WEATHER_CONFIG.useGeolocation) {
-    getUserLocation()
-      .then(coords => {
-        // Update coordinates with user's location
-        WEATHER_CONFIG.lat = coords.latitude;
-        WEATHER_CONFIG.lon = coords.longitude;
-        fetchWeatherData();
-      })
-      .catch(error => {
-        console.warn('Geolocation error, using default coordinates:', error);
-        fetchWeatherData(); // Fallback to default coordinates
-      });
+  // First, immediately try to show cached weather
+  const cachedWeatherData = getCachedWeatherData();
+  if (cachedWeatherData) {
+    displayWeatherData(cachedWeatherData, true);
   } else {
-    fetchWeatherData();
+    // Show placeholder if no cache
+    if (weatherIcon) weatherIcon.innerHTML = icons['cloud'];
+    if (temperatureElement) temperatureElement.textContent = '--°';
+    if (feelsLikeElement) feelsLikeElement.textContent = 'Feels: --°';
+    if (weatherConditionElement) weatherConditionElement.textContent = 'Loading...';
   }
+  
+  // Then defer fresh weather loading until page is interactive
+  // Use requestIdleCallback if available, or setTimeout as fallback
+  const deferWeatherLoad = window.requestIdleCallback || 
+    ((cb) => setTimeout(cb, 1000)); // 1 second delay if requestIdleCallback not available
+  
+  deferWeatherLoad(() => {
+    if (WEATHER_CONFIG.useGeolocation) {
+      getUserLocation()
+        .then(coords => {
+          // Update coordinates with user's location
+          WEATHER_CONFIG.lat = coords.latitude;
+          WEATHER_CONFIG.lon = coords.longitude;
+          fetchWeatherData(false, cachedWeatherData ? true : false); // Only show loading if we don't have cache
+        })
+        .catch(error => {
+          console.warn('Geolocation error, using default coordinates:', error);
+          fetchWeatherData(false, cachedWeatherData ? true : false); // Fallback to default coordinates
+        });
+    } else {
+      fetchWeatherData(false, cachedWeatherData ? true : false);
+    }
+  });
 
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
@@ -477,40 +490,43 @@ function setupWeather() {
   }
 }
 
-// Function to get user's geolocation
+// Add the missing getUserLocation function
 function getUserLocation() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) {
       reject(new Error('Geolocation is not supported by your browser'));
       return;
     }
-
+    
     navigator.geolocation.getCurrentPosition(
-      position => {
-        resolve(position.coords);
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
       },
-      error => {
+      (error) => {
         reject(error);
       },
       {
-        enableHighAccuracy: false, // Don't need high accuracy for weather
-        timeout: 5000, // 5 seconds timeout
-        maximumAge: 600000 // Cache location for 10 minutes
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 60 * 60 * 1000 // 1 hour
       }
     );
   });
 }
 
-function fetchWeatherData(forceRefresh = false) {
+function fetchWeatherData(forceRefresh = false, quietMode = false) {
   // Check if we have cached data
   const cachedWeatherData = forceRefresh ? null : getCachedWeatherData();
-  if (cachedWeatherData) {
+  if (cachedWeatherData && !forceRefresh) {
     displayWeatherData(cachedWeatherData);
     return;
   }
 
-  // Show loading state
-  if (weatherIcon) {
+  // Show loading state (unless in quiet mode)
+  if (weatherIcon && !quietMode) {
     weatherIcon.innerHTML = `<div class="weather-loader"></div>`;
   }
 
@@ -526,15 +542,17 @@ function fetchWeatherData(forceRefresh = false) {
     .then(data => {
       // Save to cache and display
       cacheWeatherData(data);
-      displayWeatherData(data);
+      displayWeatherData(data, false, forceRefresh);
     })
     .catch(error => {
       console.error('Error fetching weather:', error);
-      displayWeatherError();
+      if (!quietMode) {
+        displayWeatherError();
+      }
     });
 }
 
-function displayWeatherData(data) {
+function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
   try {
     // Get icon from mapping or use cloud as fallback
     const iconCode = data.weather[0].icon || '03d';
@@ -551,7 +569,10 @@ function displayWeatherData(data) {
     // Update UI
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
     if (temperatureElement) temperatureElement.textContent = `${temperature}°`;
-    if (feelsLikeElement) feelsLikeElement.textContent = `Feels: ${feelsLike}°`;
+    if (feelsLikeElement) {
+      feelsLikeElement.textContent = `Feels: ${feelsLike}°`;
+    }
+    
     if (weatherConditionElement) {
       // Capitalize first letter of each word
       const description = data.weather[0].description
@@ -567,7 +588,7 @@ function displayWeatherData(data) {
       weatherContainer.style.visibility = 'visible';
     } else if (!initialAnimationComplete && weatherContainer) {
       // Don't interfere with the initial animation
-    } else if (weatherContainer) {
+    } else if (weatherContainer && !fromCache) {
       // If this is a refresh after initial load, add the update animation
       weatherContainer.classList.add('weather-updated');
       setTimeout(() => {
@@ -576,7 +597,10 @@ function displayWeatherData(data) {
     }
 
     // Update day/night dial based on sunrise/sunset if available
-    updateDayNightDialWithSunData(sunrise, sunset);
+    // Skip this update if it's a manual refresh (skipDialUpdate = true)
+    if (!skipDialUpdate) {
+      updateDayNightDialWithSunData(sunrise, sunset);
+    }
   } catch (error) {
     console.error('Error parsing weather data:', error);
     displayWeatherError();
@@ -773,17 +797,15 @@ function init() {
   createLinkSections();
   setupSearchInput();
   
-  // Perform entrance animations
-  performEntranceAnimations();
+  // Immediately update clock with fast animation
+  updateClock();
+  setInterval(updateClock, 1000);
   
-  // Setup weather
+  // Setup weather with cached data first
   setupWeather();
   
-  // Set up clock updates after animations begin
-  setTimeout(() => {
-    updateClock();
-    setInterval(updateClock, 1000);
-  }, 100);
+  // Perform entrance animations last, based on available data
+  performEntranceAnimations();
 }
 
 // Run initialization when page loads

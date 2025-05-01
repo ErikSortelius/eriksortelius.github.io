@@ -15,7 +15,6 @@
   --orange-300: #fdba74;
   --purple-300: #d8b4fe;
   --red-300: #fca5a5;
-  --teal-300: #5eead4;
   --neumorphic-shadow: 6px 6px 12px rgba(0, 0, 0, 0.4), -6px -6px 12px rgba(60, 60, 70, 0.1);
   --neumorphic-shadow-subtle: 4px 4px 8px rgba(0, 0, 0, 0.3), -4px -4px 8px rgba(60, 60, 70, 0.1);
 
@@ -25,7 +24,6 @@
   --orange-accent-bg: rgba(253, 186, 116, 0.07);
   --purple-accent-bg: rgba(216, 180, 254, 0.07);
   --red-accent-bg: rgba(252, 165, 165, 0.07);
-  --teal-accent-bg: rgba(94, 234, 212, 0.07);
 }
 
 * {
@@ -34,18 +32,24 @@
   box-sizing: border-box;
 }
 
+html, body {
+  height: 100%;
+  overflow-y: auto;
+}
+
 body {
   font-family: 'Inter', sans-serif;
   background-color: var(--bg-color);
   color: var(--text-color);
-  min-height: 100vh;
   padding: 1.5rem;
   overflow-x: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* Layout */
 .container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -53,6 +57,7 @@ body {
   position: relative;
   z-index: 10;
   overflow: hidden;
+  width: 100%;
 }
 
 .max-width-container {
@@ -276,15 +281,9 @@ body {
 /* Links container */
 .links-container {
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   gap: 1rem;
   justify-content: center;
-  width: 100%;
-  max-width: 100%; /* Using full width available */
-  margin-left: auto;
-  margin-right: auto;
-  overflow-x: visible;
-  padding-bottom: 0.5rem;
 }
 
 /* Link section */
@@ -292,9 +291,9 @@ body {
   background-color: var(--bg-color-light);
   border-radius: 0.75rem;
   padding: 1.25rem;
-  flex: 0 0 auto;
-  width: 220px; /* Fixed width for all sections */
-  height: 220px; /* Fixed height for all sections */
+  flex: 1;
+  min-width: 200px;
+  max-width: 280px;
   box-shadow: var(--neumorphic-shadow-subtle);
   border: 1px solid var(--border-color);
   transition: all 0.5s;
@@ -348,10 +347,6 @@ body {
   background-color: var(--red-accent-bg);
 }
 
-.link-section:has(.link-section-title.trackers):hover::before {
-  background-color: var(--teal-accent-bg);
-}
-
 .link-section-title {
   font-size: 1.125rem;
   font-weight: 500;
@@ -379,10 +374,6 @@ body {
 
 .link-section:hover .link-section-title.art {
   color: var(--red-300);
-}
-
-.link-section:hover .link-section-title.trackers {
-  color: var(--teal-300);
 }
 
 .link-list {
@@ -554,8 +545,49 @@ body {
   }
 }
 
+/* Non-interactive elements */
+.clock-container,
+.top-section,
+.center-group,
+.clock,
+.time,
+.day-night-dial,
+.dial-ring,
+.sun-icon,
+.moon-icon,
+.bottom-section,
+.weather-container,
+.weather-icon svg,
+.weather-info,
+.temp-container,
+.temperature,
+.feels-like,
+.weather-condition,
+.date-info,
+.date,
+.weekday-info,
+.weekday,
+.week-number {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  pointer-events: none;
+}
+
+/* Allow pointer events only on the weather icon so it remains clickable for refresh */
+.weather-icon {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
 /* Media queries */
 @media (max-width: 768px) {
+  body {
+    align-items: flex-start;
+    padding-top: 2rem;
+  }
+
   .clock-container {
     padding: 1rem;
   }
@@ -612,10 +644,5 @@ body {
 
   .search-input-wrapper {
     width: 80%;
-  }
-
-  .links-container {
-    justify-content: flex-start; /* Left align on mobile for better scrolling */
-    padding-bottom: 1rem; /* More space for scrollbar on mobile */
   }
 }
