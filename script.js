@@ -128,8 +128,9 @@ const dialRing2 = dial2?.querySelector('.dial-ring');
 const dialMarker1 = dial1?.querySelector('.dial-marker');
 const dialMarker2 = dial2?.querySelector('.dial-marker');
 
-// Animation state
-let initialAnimationComplete = false;
+const linksContainer = document.querySelector('.links-container');
+const searchInput = document.getElementById('searchInput');
+const searchForm = document.getElementById('searchForm');
 
 // Weather elements
 const weatherContainer = document.querySelector('.weather-container');
@@ -297,7 +298,7 @@ function updateClock() {
   updateTimeWithTransition(clock1TimeString, clock1TimeElement);
   updateTimeWithTransition(clock2TimeString, clock2TimeElement);
 
-  if (dateElement.textContent !== dateString) {
+  if (dateElement && dateElement.textContent !== dateString) {
     dateElement.style.opacity = 0;
     dateElement.style.transform = 'translateY(8px)';
 
@@ -310,7 +311,7 @@ function updateClock() {
     });
   }
 
-  if (weekdayElement.textContent !== weekdayString) {
+  if (weekdayElement && weekdayElement.textContent !== weekdayString) {
     weekdayElement.style.opacity = 0;
     weekdayElement.style.transform = 'translateY(8px)';
 
@@ -323,7 +324,9 @@ function updateClock() {
     });
   }
 
-  weekNumberElement.textContent = `Week ${weekNumber}`;
+  if (weekNumberElement) {
+    weekNumberElement.textContent = `Week ${weekNumber}`;
+  }
 
   // Update dual day/night dials
   updateDayNightDials();
@@ -955,7 +958,7 @@ function performEntranceAnimations() {
     weatherContainer.style.transition = 'none';
     weatherContainer.style.opacity = '0';
     weatherContainer.style.transform = 'translateY(20px)';
-    weatherContainer.style.visibility = 'visible'; // Make sure it's visible for animation
+    weatherContainer.style.visibility = 'visible';
   }
   
   // Force browser reflow
@@ -990,8 +993,6 @@ function performEntranceAnimations() {
       activeIcon2.style.transform = 'rotate(0deg)';
     }
     
-    // No animation for clock digits - they're already visible
-    
     // 4. Animate date elements - starts immediately with 120ms stagger
     if (dateElement) {
       dateElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
@@ -1005,14 +1006,14 @@ function performEntranceAnimations() {
         weekdayElement.style.opacity = '1';
         weekdayElement.style.transform = 'translateY(0)';
       }
-    }, 120); // 120ms stagger
+    }, 120);
     
     setTimeout(() => {
       if (weekNumberElement) {
         weekNumberElement.style.transition = 'opacity 0.8s ease';
         weekNumberElement.style.opacity = '1';
       }
-    }, 240); // 120ms stagger after weekday (2 x 120ms)
+    }, 240);
     
     // 5. Weather elements - starts immediately
     if (weatherContainer) {
@@ -1038,7 +1039,6 @@ function performEntranceAnimations() {
   });
   
   // Mark animation as complete after all animations have finished
-  // Using the longest duration (dial + marker dot) to ensure all animations are done
   setTimeout(() => {
     initialAnimationComplete = true;
   }, 2000);
