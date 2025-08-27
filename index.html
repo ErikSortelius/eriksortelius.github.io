@@ -18,38 +18,68 @@
     <div class="max-width-container">
       <!-- Clock Section -->
       <div class="clock-container">
-        <!-- Top Row: Sun/Moon Dial and Clocks (centered) -->
+        <!-- Top Row: Two Clocks with their own dials -->
         <div class="top-section">
-          <div class="center-group">
-            <div class="day-night-dial">
-              <div class="dial-ring">
-                <div class="dial-marker"></div>
+          <div class="clocks-container">
+            <!-- Clock 1 -->
+            <div class="clock-group">
+              <div class="day-night-dial" id="dial1">
+                <div class="dial-ring">
+                  <div class="dial-marker"></div>
+                </div>
+                <div class="sun-icon" id="sunIcon1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="m4.93 4.93 1.41 1.41"></path>
+                    <path d="m17.66 17.66 1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="m6.34 17.66-1.41 1.41"></path>
+                    <path d="m19.07 4.93-1.41 1.41"></path>
+                  </svg>
+                </div>
+                <div class="moon-icon" id="moonIcon1">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                  </svg>
+                </div>
               </div>
-              <div class="sun-icon" id="sunIcon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="4"></circle>
-                  <path d="M12 2v2"></path>
-                  <path d="M12 20v2"></path>
-                  <path d="m4.93 4.93 1.41 1.41"></path>
-                  <path d="m17.66 17.66 1.41 1.41"></path>
-                  <path d="M2 12h2"></path>
-                  <path d="M20 12h2"></path>
-                  <path d="m6.34 17.66-1.41 1.41"></path>
-                  <path d="m19.07 4.93-1.41 1.41"></path>
-                </svg>
-              </div>
-              <div class="moon-icon" id="moonIcon">
-                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none"
-                  stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-                </svg>
-              </div>
-            </div>
-            <div class="clocks-container">
               <div class="clock clock1">
                 <h1 class="time" id="clock1Time">00:00</h1>
                 <span class="timezone-label" id="clock1Label">SWEDEN</span>
+              </div>
+            </div>
+
+            <!-- Clock 2 -->
+            <div class="clock-group">
+              <div class="day-night-dial" id="dial2">
+                <div class="dial-ring">
+                  <div class="dial-marker"></div>
+                </div>
+                <div class="sun-icon" id="sunIcon2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="4"></circle>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="m4.93 4.93 1.41 1.41"></path>
+                    <path d="m17.66 17.66 1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="m6.34 17.66-1.41 1.41"></path>
+                    <path d="m19.07 4.93-1.41 1.41"></path>
+                  </svg>
+                </div>
+                <div class="moon-icon" id="moonIcon2">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+                  </svg>
+                </div>
               </div>
               <div class="clock clock2">
                 <h1 class="time" id="clock2Time">00:00</h1>

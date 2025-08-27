@@ -115,13 +115,18 @@ const clock2LabelElement = document.getElementById('clock2Label');
 const dateElement = document.querySelector('.date');
 const weekdayElement = document.querySelector('.weekday');
 const weekNumberElement = document.querySelector('.week-number');
-const sunIcon = document.getElementById('sunIcon');
-const moonIcon = document.getElementById('moonIcon');
-const dialRing = document.querySelector('.dial-ring');
-const dialMarker = document.querySelector('.dial-marker');
-const linksContainer = document.querySelector('.links-container');
-const searchInput = document.getElementById('searchInput');
-const searchForm = document.getElementById('searchForm');
+
+// Dual dial elements
+const dial1 = document.getElementById('dial1');
+const dial2 = document.getElementById('dial2');
+const sunIcon1 = document.getElementById('sunIcon1');
+const moonIcon1 = document.getElementById('moonIcon1');
+const sunIcon2 = document.getElementById('sunIcon2');
+const moonIcon2 = document.getElementById('moonIcon2');
+const dialRing1 = dial1?.querySelector('.dial-ring');
+const dialRing2 = dial2?.querySelector('.dial-ring');
+const dialMarker1 = dial1?.querySelector('.dial-marker');
+const dialMarker2 = dial2?.querySelector('.dial-marker');
 
 // Animation state
 let initialAnimationComplete = false;
@@ -226,6 +231,56 @@ function formatTimeForTimezone(timezone) {
   });
 }
 
+function getCurrentHourAngleForTimezone(timezone) {
+  const now = new Date();
+  const timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  const hours = timeInTimezone.getHours();
+  const minutes = timeInTimezone.getMinutes();
+  const totalHours = hours % 12 + minutes / 60;
+  return (totalHours / 12) * 360;
+}
+
+function checkIsDayTimeForTimezone(timezone) {
+  const now = new Date();
+  const timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  const hours = timeInTimezone.getHours();
+  // Day is between 6 AM and 9 PM
+  return hours >= 6 && hours < 21;
+}
+
+// Update day/night dials for both timezones
+function updateDayNightDials() {
+  // Update dial 1 (first timezone)
+  const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
+  const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
+  
+  if (dialRing1) {
+    dialRing1.style.transform = `rotate(${rotationAngle1}deg)`;
+  }
+  
+  if (sunIcon1 && moonIcon1) {
+    sunIcon1.style.opacity = isDay1 ? 1 : 0;
+    sunIcon1.style.transform = isDay1 ? 'rotate(0deg)' : 'rotate(90deg)';
+    moonIcon1.style.opacity = isDay1 ? 0 : 1;
+    moonIcon1.style.transform = isDay1 ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
+  
+  // Update dial 2 (second timezone)
+  const rotationAngle2 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock2.timezone);
+  const isDay2 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+  
+  if (dialRing2) {
+    dialRing2.style.transform = `rotate(${rotationAngle2}deg)`;
+  }
+  
+  if (sunIcon2 && moonIcon2) {
+    sunIcon2.style.opacity = isDay2 ? 1 : 0;
+    sunIcon2.style.transform = isDay2 ? 'rotate(0deg)' : 'rotate(90deg)';
+    moonIcon2.style.opacity = isDay2 ? 0 : 1;
+    moonIcon2.style.transform = isDay2 ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
+}
+
 // Initialize and Update Clocks
 function updateClock() {
   const now = new Date();
@@ -270,8 +325,8 @@ function updateClock() {
 
   weekNumberElement.textContent = `Week ${weekNumber}`;
 
-  // Update day/night dial
-  updateDayNightDial(now);
+  // Update dual day/night dials
+  updateDayNightDials();
 }
 
 // Update time with smooth digit transitions
@@ -793,32 +848,57 @@ function getCachedWeatherData() {
 
 // Clean and focused entrance animations
 function performEntranceAnimations() {
-  const now = new Date();
-  const isDay = checkIsDayTime(now);
-  const rotationAngle = getCurrentHourAngle();
+  const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
+  const rotationAngle2 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock2.timezone);
+  const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
+  const isDay2 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
   
-  // Set initial states
-  if (dialRing) {
-    dialRing.style.transition = 'none';
-    dialRing.style.transform = 'rotate(0deg)';
+  // Set initial states for both dials
+  if (dialRing1) {
+    dialRing1.style.transition = 'none';
+    dialRing1.style.transform = 'rotate(0deg)';
   }
   
-  if (dialMarker) {
-    dialMarker.style.transition = 'none';
-    dialMarker.style.opacity = '0';
-    dialMarker.style.transform = 'translate(-50%, -50%) scale(0)';
+  if (dialRing2) {
+    dialRing2.style.transition = 'none';
+    dialRing2.style.transform = 'rotate(0deg)';
   }
   
-  if (sunIcon) {
-    sunIcon.style.transition = 'none';
-    sunIcon.style.opacity = '0';
-    sunIcon.style.transform = `rotate(${isDay ? -120 : 0}deg)`;
+  if (dialMarker1) {
+    dialMarker1.style.transition = 'none';
+    dialMarker1.style.opacity = '0';
+    dialMarker1.style.transform = 'translate(-50%, -50%) scale(0)';
   }
   
-  if (moonIcon) {
-    moonIcon.style.transition = 'none';
-    moonIcon.style.opacity = '0';
-    moonIcon.style.transform = `rotate(${isDay ? 0 : 120}deg)`;
+  if (dialMarker2) {
+    dialMarker2.style.transition = 'none';
+    dialMarker2.style.opacity = '0';
+    dialMarker2.style.transform = 'translate(-50%, -50%) scale(0)';
+  }
+  
+  // Set initial states for sun/moon icons
+  if (sunIcon1) {
+    sunIcon1.style.transition = 'none';
+    sunIcon1.style.opacity = '0';
+    sunIcon1.style.transform = `rotate(${isDay1 ? -120 : 0}deg)`;
+  }
+  
+  if (moonIcon1) {
+    moonIcon1.style.transition = 'none';
+    moonIcon1.style.opacity = '0';
+    moonIcon1.style.transform = `rotate(${isDay1 ? 0 : 120}deg)`;
+  }
+  
+  if (sunIcon2) {
+    sunIcon2.style.transition = 'none';
+    sunIcon2.style.opacity = '0';
+    sunIcon2.style.transform = `rotate(${isDay2 ? -120 : 0}deg)`;
+  }
+  
+  if (moonIcon2) {
+    moonIcon2.style.transition = 'none';
+    moonIcon2.style.opacity = '0';
+    moonIcon2.style.transform = `rotate(${isDay2 ? 0 : 120}deg)`;
   }
   
   // Set initial state for time displays
@@ -883,18 +963,31 @@ function performEntranceAnimations() {
   
   // Start animations with updated timing
   requestAnimationFrame(() => {
-    // 1. Animate the dial ring - starts immediately, duration 1.8s
-    if (dialRing) {
-      dialRing.style.transition = 'transform 1.8s ease-out';
-      dialRing.style.transform = `rotate(${rotationAngle + 360}deg)`;
+    // 1. Animate both dial rings
+    if (dialRing1) {
+      dialRing1.style.transition = 'transform 1.8s ease-out';
+      dialRing1.style.transform = `rotate(${rotationAngle1 + 360}deg)`;
     }
     
-    // 2. Fade in and rotate the active icon - starts immediately, duration 1.0-1.2s
-    const activeIcon = isDay ? sunIcon : moonIcon;
-    if (activeIcon) {
-      activeIcon.style.transition = 'opacity 1s ease, transform 1.2s ease';
-      activeIcon.style.opacity = '1';
-      activeIcon.style.transform = 'rotate(0deg)';
+    if (dialRing2) {
+      dialRing2.style.transition = 'transform 1.8s ease-out';
+      dialRing2.style.transform = `rotate(${rotationAngle2 + 360}deg)`;
+    }
+    
+    // 2. Fade in and rotate active icons for both dials
+    const activeIcon1 = isDay1 ? sunIcon1 : moonIcon1;
+    const activeIcon2 = isDay2 ? sunIcon2 : moonIcon2;
+    
+    if (activeIcon1) {
+      activeIcon1.style.transition = 'opacity 1s ease, transform 1.2s ease';
+      activeIcon1.style.opacity = '1';
+      activeIcon1.style.transform = 'rotate(0deg)';
+    }
+    
+    if (activeIcon2) {
+      activeIcon2.style.transition = 'opacity 1s ease, transform 1.2s ease';
+      activeIcon2.style.opacity = '1';
+      activeIcon2.style.transform = 'rotate(0deg)';
     }
     
     // No animation for clock digits - they're already visible
@@ -928,12 +1021,18 @@ function performEntranceAnimations() {
       weatherContainer.style.transform = 'translateY(0)';
     }
     
-    // 6. Animate the marker dot - delayed start after 1200ms
+    // 6. Animate both marker dots - delayed start after 1200ms
     setTimeout(() => {
-      if (dialMarker) {
-        dialMarker.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        dialMarker.style.opacity = '1';
-        dialMarker.style.transform = 'translate(-50%, -50%) scale(1)';
+      if (dialMarker1) {
+        dialMarker1.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        dialMarker1.style.opacity = '1';
+        dialMarker1.style.transform = 'translate(-50%, -50%) scale(1)';
+      }
+      
+      if (dialMarker2) {
+        dialMarker2.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        dialMarker2.style.opacity = '1';
+        dialMarker2.style.transform = 'translate(-50%, -50%) scale(1)';
       }
     }, 1200);
   });

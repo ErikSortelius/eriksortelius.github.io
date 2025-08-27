@@ -121,8 +121,16 @@ body {
 /* Clocks container for dual timezone display */
 .clocks-container {
   display: flex;
-  gap: 3rem;
+  gap: 4rem;
   align-items: center;
+  justify-content: center;
+}
+
+.clock-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
 }
 
 .clock {
@@ -184,8 +192,8 @@ body {
 /* Day/Night dial */
 .day-night-dial {
   position: relative;
-  width: 5rem;
-  height: 5rem;
+  width: 4rem;
+  height: 4rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -614,8 +622,12 @@ body {
   }
 
   .clocks-container {
-    flex-direction: column;
-    gap: 1.5rem;
+    gap: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .clock-group {
+    gap: 0.75rem;
   }
 
   .top-section,
@@ -666,5 +678,16 @@ body {
 
   .search-input-wrapper {
     width: 80%;
+  }
+}
+
+@media (max-width: 480px) {
+  .clocks-container {
+    flex-direction: column;
+    gap: 2rem;
+  }
+
+  .top-section {
+    gap: 1.5rem;
   }
 }
