@@ -81,8 +81,37 @@ const icons = {
   bookmark: `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>`
 };
 
+/**
+ * CLOCK CONFIGURATION - Easy to modify
+ * 
+ * To change timezones and labels:
+ * 1. Update the timezone property with any valid IANA timezone identifier
+ * 2. Update the label property with your preferred display text
+ * 
+ * Examples of timezone identifiers:
+ * - 'America/New_York' (Eastern Time)
+ * - 'America/Los_Angeles' (Pacific Time)
+ * - 'Europe/London' (GMT/BST)
+ * - 'Europe/Paris' (CET/CEST)
+ * - 'Asia/Tokyo' (JST)
+ * - 'Australia/Sydney' (AEST/AEDT)
+ */
+const CLOCK_CONFIG = {
+  clock1: {
+    timezone: 'Europe/Stockholm',
+    label: 'SWEDEN'
+  },
+  clock2: {
+    timezone: 'Asia/Singapore',
+    label: 'SINGAPORE'
+  }
+};
+
 // DOM elements
-const timeElement = document.querySelector('.time');
+const clock1TimeElement = document.getElementById('clock1Time');
+const clock2TimeElement = document.getElementById('clock2Time');
+const clock1LabelElement = document.getElementById('clock1Label');
+const clock2LabelElement = document.getElementById('clock2Label');
 const dateElement = document.querySelector('.date');
 const weekdayElement = document.querySelector('.weekday');
 const weekNumberElement = document.querySelector('.week-number');
@@ -182,16 +211,36 @@ function checkIsDayTime(current) {
   return hours >= 6 && hours < 21;
 }
 
-// Initialize and Update Clock
+/**
+ * Formats time for a specific timezone
+ * @param {string} timezone - IANA timezone identifier (e.g., 'Europe/Stockholm')
+ * @returns {string} Formatted time string (HH:MM)
+ */
+function formatTimeForTimezone(timezone) {
+  const now = new Date();
+  return now.toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+    timeZone: timezone
+  });
+}
+
+// Initialize and Update Clocks
 function updateClock() {
   const now = new Date();
-  const timeString = formatTime(now);
+  
+  // Get times for both configured timezones
+  const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
+  const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+  
   const dateString = formatDate(now);
   const weekdayString = getWeekday(now);
   const weekNumber = getWeekNumber(now);
 
-  // Update display with smooth transitions
-  updateTimeWithTransition(timeString);
+  // Update both clocks with smooth transitions
+  updateTimeWithTransition(clock1TimeString, clock1TimeElement);
+  updateTimeWithTransition(clock2TimeString, clock2TimeElement);
 
   if (dateElement.textContent !== dateString) {
     dateElement.style.opacity = 0;
@@ -226,7 +275,9 @@ function updateClock() {
 }
 
 // Update time with smooth digit transitions
-function updateTimeWithTransition(newTimeString) {
+function updateTimeWithTransition(newTimeString, timeElement) {
+  if (!timeElement) return;
+  
   const currentTimeDigits = timeElement.textContent.split('');
   const newTimeDigits = newTimeString.split('');
 
@@ -770,18 +821,36 @@ function performEntranceAnimations() {
     moonIcon.style.transform = `rotate(${isDay ? 0 : 120}deg)`;
   }
   
-  // Set initial state for time display
-  if (timeElement) {
-    const timeString = formatTime(now);
-    timeElement.innerHTML = ''; // Clear any existing content
+  // Set initial state for time displays
+  if (clock1TimeElement) {
+    const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
+    clock1TimeElement.innerHTML = '';
     
-    // Create digits with visibility immediately (no animation)
-    timeString.split('').forEach(digit => {
+    clock1TimeString.split('').forEach(digit => {
       const digitSpan = document.createElement('span');
       digitSpan.textContent = digit;
-      // No initial transforms or opacity changes - show immediately
-      timeElement.appendChild(digitSpan);
+      clock1TimeElement.appendChild(digitSpan);
     });
+  }
+  
+  if (clock2TimeElement) {
+    const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+    clock2TimeElement.innerHTML = '';
+    
+    clock2TimeString.split('').forEach(digit => {
+      const digitSpan = document.createElement('span');
+      digitSpan.textContent = digit;
+      clock2TimeElement.appendChild(digitSpan);
+    });
+  }
+  
+  // Set timezone labels
+  if (clock1LabelElement) {
+    clock1LabelElement.textContent = CLOCK_CONFIG.clock1.label;
+  }
+  
+  if (clock2LabelElement) {
+    clock2LabelElement.textContent = CLOCK_CONFIG.clock2.label;
   }
   
   // Set initial states for date elements
@@ -882,7 +951,7 @@ function init() {
   createLinkSections();
   setupSearchInput();
   
-  // Immediately update clock with fast animation
+  // Immediately update clocks
   updateClock();
   setInterval(updateClock, 1000);
   

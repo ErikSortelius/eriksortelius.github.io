@@ -111,16 +111,25 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* Center group for sun/moon dial and clock */
+/* Center group for sun/moon dial and clocks */
 .center-group {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 2rem;
+}
+
+/* Clocks container for dual timezone display */
+.clocks-container {
+  display: flex;
+  gap: 3rem;
+  align-items: center;
 }
 
 .clock {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .time {
@@ -128,6 +137,7 @@ body {
   font-weight: 300;
   letter-spacing: 0.05em;
   display: flex;
+  line-height: 1;
 }
 
 .time span {
@@ -599,6 +609,15 @@ body {
     padding: 1rem;
   }
 
+  .center-group {
+    gap: 1rem;
+  }
+
+  .clocks-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
   .top-section,
   .bottom-section {
     flex-direction: column;
@@ -609,10 +628,6 @@ body {
   .date-info {
     align-items: center;
     margin-top: 0.5rem;
-  }
-
-  .clock {
-    justify-content: center;
   }
 
   .time {
