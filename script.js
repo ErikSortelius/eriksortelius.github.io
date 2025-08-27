@@ -492,6 +492,12 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
 
 // Create link sections
 function createLinkSections() {
+  // Add null check for linksContainer
+  if (!linksContainer) {
+    console.error('Links container element not found');
+    return;
+  }
+  
   categories.forEach((category, index) => {
     const section = document.createElement('div');
     section.className = 'link-section';
