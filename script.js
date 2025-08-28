@@ -102,10 +102,13 @@ const CLOCK_CONFIG = {
     label: 'SWEDEN'
   },
   clock2: {
-    timezone: 'Asia/Singapore',
-    label: 'SINGAPORE'
+    useLocalTime: true,
+    label: 'CURRENT LOCATION'
   }
 };
+
+// Animation state
+let initialAnimationComplete = false;
 
 // DOM elements
 const clock1TimeElement = document.getElementById('clock1Time');
@@ -218,12 +221,20 @@ function checkIsDayTime(current) {
 }
 
 /**
- * Formats time for a specific timezone
- * @param {string} timezone - IANA timezone identifier (e.g., 'Europe/Stockholm')
+ * Formats time for a specific timezone or local time
+ * @param {string} timezone - IANA timezone identifier (e.g., 'Europe/Stockholm') or null for local
  * @returns {string} Formatted time string (HH:MM)
  */
 function formatTimeForTimezone(timezone) {
   const now = new Date();
+  if (!timezone) {
+    // Return local time
+    return now.toLocaleTimeString([], {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    });
+  }
   return now.toLocaleTimeString([], {
     hour: '2-digit',
     minute: '2-digit',
@@ -234,7 +245,15 @@ function formatTimeForTimezone(timezone) {
 
 function getCurrentHourAngleForTimezone(timezone) {
   const now = new Date();
-  const timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  let timeInTimezone;
+  
+  if (!timezone) {
+    // Use local time
+    timeInTimezone = now;
+  } else {
+    timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  }
+  
   const hours = timeInTimezone.getHours();
   const minutes = timeInTimezone.getMinutes();
   const totalHours = hours % 12 + minutes / 60;
@@ -243,7 +262,15 @@ function getCurrentHourAngleForTimezone(timezone) {
 
 function checkIsDayTimeForTimezone(timezone) {
   const now = new Date();
-  const timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  let timeInTimezone;
+  
+  if (!timezone) {
+    // Use local time
+    timeInTimezone = now;
+  } else {
+    timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+  }
+  
   const hours = timeInTimezone.getHours();
   // Day is between 6 AM and 9 PM
   return hours >= 6 && hours < 21;
@@ -266,9 +293,10 @@ function updateDayNightDials() {
     moonIcon1.style.transform = isDay1 ? 'rotate(90deg)' : 'rotate(0deg)';
   }
   
-  // Update dial 2 (second timezone)
-  const rotationAngle2 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock2.timezone);
-  const isDay2 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+  // Update dial 2 (local time or timezone)
+  const clock2Timezone = CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone;
+  const rotationAngle2 = getCurrentHourAngleForTimezone(clock2Timezone);
+  const isDay2 = checkIsDayTimeForTimezone(clock2Timezone);
   
   if (dialRing2) {
     dialRing2.style.transform = `rotate(${rotationAngle2}deg)`;
@@ -286,9 +314,11 @@ function updateDayNightDials() {
 function updateClock() {
   const now = new Date();
   
-  // Get times for both configured timezones
+  // Get times for both configured timezones/local
   const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+  const clock2TimeString = CLOCK_CONFIG.clock2.useLocalTime ? 
+    formatTimeForTimezone(null) : 
+    formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
   
   const dateString = formatDate(now);
   const weekdayString = getWeekday(now);
@@ -858,9 +888,10 @@ function getCachedWeatherData() {
 // Clean and focused entrance animations
 function performEntranceAnimations() {
   const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const rotationAngle2 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock2.timezone);
+  const clock2Timezone = CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone;
+  const rotationAngle2 = getCurrentHourAngleForTimezone(clock2Timezone);
   const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const isDay2 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+  const isDay2 = checkIsDayTimeForTimezone(clock2Timezone);
   
   // Set initial states for both dials
   if (dialRing1) {
@@ -923,7 +954,7 @@ function performEntranceAnimations() {
   }
   
   if (clock2TimeElement) {
-    const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
+    const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone);
     clock2TimeElement.innerHTML = '';
     
     clock2TimeString.split('').forEach(digit => {
