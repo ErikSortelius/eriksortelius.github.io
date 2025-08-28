@@ -410,69 +410,40 @@ function updateDayNightDial(now) {
   moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
 }
 
-// Update day/night dial based on sunrise and sunset times
-function updateDayNightDialWithSunData(sunrise, sunset) {
-  const now = new Date();
-
-  // Check if we have valid sunrise/sunset data
+// Remove the old updateDayNightDialWithSunData function entirely and replace with this:
+function updateWeatherBasedDayNightDials(sunrise, sunset) {
+  // Only update dial 2 (local time dial) based on weather data
+  // Dial 1 (Sweden) continues to use its timezone-based logic
+  
   if (!sunrise || !sunset) {
-    // Fallback to the default 6AM-9PM logic if no sun data
-    const hours = now.getHours();
-    const isDay = hours >= 6 && hours < 21;
-
-    // Calculate position in day/night cycle
-    const dayStart = 6;
-    const dayEnd = 21;
-    const totalDay = dayEnd - dayStart;
-
-    let percentage;
-    if (isDay) {
-      percentage = (hours - dayStart) / totalDay;
-    } else {
-      if (hours < dayStart) {
-        // Before 6AM
-        const totalNight = 24 - totalDay;
-        percentage = 0.5 + (hours / (totalNight * 2));
-      } else {
-        // After 9PM
-        const totalNight = 24 - totalDay;
-        const hoursAfterSunset = hours - dayEnd;
-        percentage = 0.5 + (hoursAfterSunset / (totalNight * 2));
-      }
-    }
-
-    // Keep percentage between 0 and 1
-    percentage = Math.min(Math.max(percentage, 0), 1);
-
-    // Convert to degrees (0-360)
-    const rotationAngle = percentage * 360;
-
-    // Update the dial
-    if (dialRing) {
-      dialRing.style.transform = `rotate(${rotationAngle}deg)`;
-    }
-
-    // Update sun/moon visibility
-    if (sunIcon) {
-      sunIcon.style.opacity = isDay ? 1 : 0;
-      sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
-    }
-
-    if (moonIcon) {
-      moonIcon.style.opacity = isDay ? 0 : 1;
-      moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
-    }
-
+    // If no sunrise/sunset data, just use the regular timezone-based updates
+    updateDayNightDials();
     return;
   }
 
-  // Use actual sunrise/sunset data when available
-  const isDay = now >= sunrise && now < sunset;
+  // Update dial 1 normally (Sweden timezone)
+  const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
+  const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
+  
+  if (dialRing1) {
+    dialRing1.style.transform = `rotate(${rotationAngle1}deg)`;
+  }
+  
+  if (sunIcon1 && moonIcon1) {
+    sunIcon1.style.opacity = isDay1 ? 1 : 0;
+    sunIcon1.style.transform = isDay1 ? 'rotate(0deg)' : 'rotate(90deg)';
+    moonIcon1.style.opacity = isDay1 ? 0 : 1;
+    moonIcon1.style.transform = isDay1 ? 'rotate(90deg)' : 'rotate(0deg)';
+  }
 
-  // Calculate position in day/night cycle
+  // Update dial 2 based on actual sunrise/sunset data from weather
+  const now = new Date();
+  const isDay2 = now >= sunrise && now < sunset;
+  
+  // Calculate dial position based on sunrise/sunset
   let percentage;
-
-  if (isDay) {
+  
+  if (isDay2) {
     // It's daytime - calculate how far through the day we are
     const dayLength = sunset - sunrise;
     const timeElapsed = now - sunrise;
@@ -499,24 +470,19 @@ function updateDayNightDialWithSunData(sunrise, sunset) {
 
   // Keep percentage between 0 and 1
   percentage = Math.min(Math.max(percentage, 0), 1);
-
+  
   // Convert to degrees (0-360)
-  const rotationAngle = percentage * 360;
-
-  // Update the dial
-  if (dialRing) {
-    dialRing.style.transform = `rotate(${rotationAngle}deg)`;
+  const rotationAngle2 = percentage * 360;
+  
+  if (dialRing2) {
+    dialRing2.style.transform = `rotate(${rotationAngle2}deg)`;
   }
-
-  // Update sun/moon visibility
-  if (sunIcon) {
-    sunIcon.style.opacity = isDay ? 1 : 0;
-    sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
-  }
-
-  if (moonIcon) {
-    moonIcon.style.opacity = isDay ? 0 : 1;
-    moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
+  
+  if (sunIcon2 && moonIcon2) {
+    sunIcon2.style.opacity = isDay2 ? 1 : 0;
+    sunIcon2.style.transform = isDay2 ? 'rotate(0deg)' : 'rotate(90deg)';
+    moonIcon2.style.opacity = isDay2 ? 0 : 1;
+    moonIcon2.style.transform = isDay2 ? 'rotate(90deg)' : 'rotate(0deg)';
   }
 }
 
@@ -809,7 +775,7 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
     // Update day/night dial based on sunrise/sunset if available
     // Skip this update if it's a manual refresh (skipDialUpdate = true)
     if (!skipDialUpdate) {
-      updateDayNightDialWithSunData(sunrise, sunset);
+      updateWeatherBasedDayNightDials(sunrise, sunset);
     }
   } catch (error) {
     console.error('Error parsing weather data:', error);
