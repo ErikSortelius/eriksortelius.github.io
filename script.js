@@ -148,10 +148,11 @@ const sunsetElement = document.getElementById('sunset');
 // Weather configuration
 const WEATHER_CONFIG = {
   apiKey: "bd94f199d3a62747c068b5f09da9bfd8",
-  lat: 59.3194903,  // Default coordinates (Stockholm)
-  lon: 18.075060000000007,
+  defaultLat: 59.3194903,  // Stockholm coordinates (fallback only)
+  defaultLon: 18.075060000000007,
   units: "metric",
-  cacheTimeMs: 4 * 60 * 60 * 1000, // Cache weather data for 4 hours instead of 30 minutes
+  cacheTimeMs: 4 * 60 * 60 * 1000, // Cache weather data for 4 hours
+  locationCacheKey: "userLocationCache", // Separate cache for location coordinates
   useGeolocation: true  // Set to true to enable geolocation
 };
 
@@ -176,6 +177,38 @@ const weatherIconMap = {
   '50d': 'cloud-fog',
   '50n': 'cloud-fog',
 };
+
+// Location caching functions
+function cacheLocationData(coords) {
+  try {
+    const locationData = {
+      latitude: coords.latitude,
+      longitude: coords.longitude,
+      timestamp: Date.now()
+    };
+    localStorage.setItem(WEATHER_CONFIG.locationCacheKey, JSON.stringify(locationData));
+    console.log('Location cached successfully:', coords);
+  } catch (error) {
+    console.error('Error caching location data:', error);
+  }
+}
+
+function getCachedLocationData() {
+  try {
+    const cachedItem = localStorage.getItem(WEATHER_CONFIG.locationCacheKey);
+    if (!cachedItem) return null;
+
+    const locationData = JSON.parse(cachedItem);
+    console.log('Using cached location:', locationData);
+    return {
+      latitude: locationData.latitude,
+      longitude: locationData.longitude
+    };
+  } catch (error) {
+    console.error('Error getting cached location data:', error);
+    return null;
+  }
+}
 
 // Utility functions
 function formatTime(date) {
@@ -569,67 +602,81 @@ function setupWeather() {
     if (weatherConditionElement) weatherConditionElement.textContent = 'Loading...';
   }
   
-  // Then defer fresh weather loading until page is interactive
-  // Use requestIdleCallback if available, or setTimeout as fallback
+  // Then defer location determination and weather loading until page is interactive
   const deferWeatherLoad = window.requestIdleCallback || 
-    ((cb) => setTimeout(cb, 1000)); // 1 second delay if requestIdleCallback not available
+    ((cb) => setTimeout(cb, 1000));
   
   deferWeatherLoad(() => {
-    if (WEATHER_CONFIG.useGeolocation) {
-      getUserLocation()
-        .then(coords => {
-          // Update coordinates with user's location
-          WEATHER_CONFIG.lat = coords.latitude;
-          WEATHER_CONFIG.lon = coords.longitude;
-          fetchWeatherData(false, cachedWeatherData ? true : false); // Only show loading if we don't have cache
-        })
-        .catch(error => {
-          console.warn('Geolocation error, using default coordinates:', error);
-          fetchWeatherData(false, cachedWeatherData ? true : false); // Fallback to default coordinates
-        });
-    } else {
-      fetchWeatherData(false, cachedWeatherData ? true : false);
-    }
+    determineLocationAndFetchWeather(cachedWeatherData ? true : false);
   });
 
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
-      // Don't get new location on manual refresh - use existing coordinates
-      fetchWeatherData(true); // Force refresh with existing coordinates
+      // Manual refresh uses existing cached coordinates, no new geolocation
+      const cachedLocation = getCachedLocationData();
+      const coords = cachedLocation || {
+        latitude: WEATHER_CONFIG.defaultLat,
+        longitude: WEATHER_CONFIG.defaultLon
+      };
+      fetchWeatherData(true, false, coords); // Force refresh, not quiet, with coordinates
     });
   }
 }
 
-// Add the missing getUserLocation function
-function getUserLocation() {
-  return new Promise((resolve, reject) => {
-    if (!navigator.geolocation) {
-      reject(new Error('Geolocation is not supported by your browser'));
-      return;
-    }
-    
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        resolve({
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude
-        });
-      },
-      (error) => {
-        reject(error);
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 5000,
-        maximumAge: 60 * 60 * 1000 // 1 hour
-      }
-    );
-  });
+function determineLocationAndFetchWeather(quietMode = false) {
+  // Step 1: Check for cached location coordinates
+  const cachedLocation = getCachedLocationData();
+  
+  if (cachedLocation) {
+    // Use cached coordinates
+    console.log('Using cached location for weather');
+    fetchWeatherData(false, quietMode, cachedLocation);
+    return;
+  }
+  
+  // Step 2: No cached location, try geolocation if enabled
+  if (WEATHER_CONFIG.useGeolocation) {
+    console.log('No cached location, requesting geolocation');
+    getUserLocation()
+      .then(coords => {
+        // Cache the coordinates for future use
+        cacheLocationData(coords);
+        fetchWeatherData(false, quietMode, coords);
+      })
+      .catch(error => {
+        console.warn('Geolocation failed, using default Stockholm coordinates:', error);
+        // Step 3: Fallback to Stockholm coordinates
+        const fallbackCoords = {
+          latitude: WEATHER_CONFIG.defaultLat,
+          longitude: WEATHER_CONFIG.defaultLon
+        };
+        fetchWeatherData(false, quietMode, fallbackCoords);
+      });
+  } else {
+    // Step 3: Geolocation disabled, use Stockholm coordinates
+    console.log('Geolocation disabled, using default coordinates');
+    const defaultCoords = {
+      latitude: WEATHER_CONFIG.defaultLat,
+      longitude: WEATHER_CONFIG.defaultLon
+    };
+    fetchWeatherData(false, quietMode, defaultCoords);
+  }
 }
 
-function fetchWeatherData(forceRefresh = false, quietMode = false) {
-  // Check if we have cached data
+function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates = null) {
+  // Determine coordinates to use
+  let coords = coordinates;
+  if (!coords) {
+    // Fallback coordinate determination
+    const cachedLocation = getCachedLocationData();
+    coords = cachedLocation || {
+      latitude: WEATHER_CONFIG.defaultLat,
+      longitude: WEATHER_CONFIG.defaultLon
+    };
+  }
+
+  // Check if we have cached weather data (unless forcing refresh)
   const cachedWeatherData = forceRefresh ? null : getCachedWeatherData();
   if (cachedWeatherData && !forceRefresh) {
     displayWeatherData(cachedWeatherData);
@@ -641,7 +688,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false) {
     weatherIcon.innerHTML = `<div class="weather-loader"></div>`;
   }
 
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${WEATHER_CONFIG.lat}&lon=${WEATHER_CONFIG.lon}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
 
   fetch(apiUrl)
     .then(response => {
