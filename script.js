@@ -210,6 +210,33 @@ function getCachedLocationData() {
   }
 }
 
+// Geolocation function - moved here before weather functions
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) {
+      reject(new Error('Geolocation is not supported by your browser'));
+      return;
+    }
+    
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        resolve({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+      },
+      (error) => {
+        reject(error);
+      },
+      {
+        enableHighAccuracy: false,
+        timeout: 5000,
+        maximumAge: 60 * 60 * 1000 // 1 hour
+      }
+    );
+  });
+}
+
 // Utility functions
 function formatTime(date) {
   return date.toLocaleTimeString([], {
@@ -588,7 +615,7 @@ function setupSearchInput() {
   }, 500);
 }
 
-// Weather functions
+// Weather functions - restructured for better flow
 function setupWeather() {
   // First, immediately try to show cached weather
   const cachedWeatherData = getCachedWeatherData();
@@ -596,10 +623,7 @@ function setupWeather() {
     displayWeatherData(cachedWeatherData, true);
   } else {
     // Show placeholder if no cache
-    if (weatherIcon) weatherIcon.innerHTML = icons['cloud'];
-    if (temperatureElement) temperatureElement.textContent = '--°';
-    if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
-    if (weatherConditionElement) weatherConditionElement.textContent = 'Loading...';
+    showWeatherPlaceholder();
   }
   
   // Then defer location determination and weather loading until page is interactive
@@ -607,73 +631,92 @@ function setupWeather() {
     ((cb) => setTimeout(cb, 1000));
   
   deferWeatherLoad(() => {
-    determineLocationAndFetchWeather(cachedWeatherData ? true : false);
+    initializeWeatherWithLocation(cachedWeatherData ? true : false);
   });
 
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
-      // Manual refresh uses existing cached coordinates, no new geolocation
-      const cachedLocation = getCachedLocationData();
-      const coords = cachedLocation || {
-        latitude: WEATHER_CONFIG.defaultLat,
-        longitude: WEATHER_CONFIG.defaultLon
-      };
-      fetchWeatherData(true, false, coords); // Force refresh, not quiet, with coordinates
+      // Manual refresh uses the same logic as startup
+      initializeWeatherWithLocation(false); // Never quiet on manual refresh
     });
   }
 }
 
-function determineLocationAndFetchWeather(quietMode = false) {
-  // Step 1: Check for cached location coordinates
-  const cachedLocation = getCachedLocationData();
-  
-  if (cachedLocation) {
-    // Use cached coordinates
-    console.log('Using cached location for weather');
-    fetchWeatherData(false, quietMode, cachedLocation);
-    return;
-  }
-  
-  // Step 2: No cached location, try geolocation if enabled
-  if (WEATHER_CONFIG.useGeolocation) {
-    console.log('No cached location, requesting geolocation');
-    getUserLocation()
-      .then(coords => {
-        // Cache the coordinates for future use
-        cacheLocationData(coords);
-        fetchWeatherData(false, quietMode, coords);
-      })
-      .catch(error => {
-        console.warn('Geolocation failed, using default Stockholm coordinates:', error);
-        // Step 3: Fallback to Stockholm coordinates
-        const fallbackCoords = {
-          latitude: WEATHER_CONFIG.defaultLat,
-          longitude: WEATHER_CONFIG.defaultLon
-        };
-        fetchWeatherData(false, quietMode, fallbackCoords);
-      });
-  } else {
-    // Step 3: Geolocation disabled, use Stockholm coordinates
-    console.log('Geolocation disabled, using default coordinates');
-    const defaultCoords = {
-      latitude: WEATHER_CONFIG.defaultLat,
-      longitude: WEATHER_CONFIG.defaultLon
-    };
-    fetchWeatherData(false, quietMode, defaultCoords);
-  }
+function showWeatherPlaceholder() {
+  if (weatherIcon) weatherIcon.innerHTML = icons['cloud'];
+  if (temperatureElement) temperatureElement.textContent = '--°';
+  if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
+  if (weatherConditionElement) weatherConditionElement.textContent = 'Loading...';
+}
+
+// Unified location determination flow used both on startup and manual refresh
+function initializeWeatherWithLocation(quietMode = false) {
+  // Step 1: Try to get location using the secure cache -> fetch -> failsafe flow
+  determineUserLocation()
+    .then(coords => {
+      console.log('Location determined:', coords);
+      // Step 2: Use the determined location to fetch weather
+      fetchWeatherData(false, quietMode, coords);
+    })
+    .catch(error => {
+      console.error('Failed to determine location:', error);
+      if (!quietMode) {
+        displayWeatherError();
+      }
+    });
+}
+
+// Secure location determination: cache -> geolocation -> Stockholm failsafe
+function determineUserLocation() {
+  return new Promise((resolve, reject) => {
+    // Step 1: Check for cached location coordinates
+    const cachedLocation = getCachedLocationData();
+    
+    if (cachedLocation) {
+      console.log('Using cached location');
+      resolve(cachedLocation);
+      return;
+    }
+    
+    // Step 2: No cached location, try geolocation if enabled
+    if (WEATHER_CONFIG.useGeolocation) {
+      console.log('No cached location, requesting geolocation');
+      getUserLocation()
+        .then(coords => {
+          // Cache the coordinates for future use
+          cacheLocationData(coords);
+          resolve(coords);
+        })
+        .catch(error => {
+          console.warn('Geolocation failed, using Stockholm failsafe:', error);
+          // Step 3: Fallback to Stockholm coordinates
+          const fallbackCoords = {
+            latitude: WEATHER_CONFIG.defaultLat,
+            longitude: WEATHER_CONFIG.defaultLon
+          };
+          resolve(fallbackCoords);
+        });
+    } else {
+      // Step 3: Geolocation disabled, use Stockholm coordinates
+      console.log('Geolocation disabled, using Stockholm failsafe');
+      const defaultCoords = {
+        latitude: WEATHER_CONFIG.defaultLat,
+        longitude: WEATHER_CONFIG.defaultLon
+      };
+      resolve(defaultCoords);
+    }
+  });
 }
 
 function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates = null) {
-  // Determine coordinates to use
-  let coords = coordinates;
-  if (!coords) {
-    // Fallback coordinate determination
-    const cachedLocation = getCachedLocationData();
-    coords = cachedLocation || {
-      latitude: WEATHER_CONFIG.defaultLat,
-      longitude: WEATHER_CONFIG.defaultLon
-    };
+  // We should always have coordinates by this point from determineUserLocation
+  if (!coordinates) {
+    console.error('fetchWeatherData called without coordinates');
+    if (!quietMode) {
+      displayWeatherError();
+    }
+    return;
   }
 
   // Check if we have cached weather data (unless forcing refresh)
@@ -688,7 +731,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
     weatherIcon.innerHTML = `<div class="weather-loader"></div>`;
   }
 
-  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coords.latitude}&lon=${coords.longitude}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
+  const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.latitude}&lon=${coordinates.longitude}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
 
   fetch(apiUrl)
     .then(response => {
