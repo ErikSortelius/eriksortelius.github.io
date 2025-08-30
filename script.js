@@ -481,7 +481,7 @@ function updateWeatherBasedDayNightDials(sunrise, sunset) {
     return;
   }
 
-  // Update dial 1 normally (Sweden timezone)
+  // Update dial 1 normally (Sweden timezone) - simple 6AM-9PM logic
   const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
   const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
   
@@ -509,7 +509,7 @@ function updateWeatherBasedDayNightDials(sunrise, sunset) {
     const timeElapsed = now - sunrise;
     percentage = timeElapsed / dayLength;
   } else {
-    // It's nighttime
+    // It's nighttime - complex calculation for night progression
     let nightLength;
     if (now < sunrise) {
       // It's before sunrise (early morning)
@@ -637,8 +637,8 @@ function setupWeather() {
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
-      // Manual refresh uses the same logic as startup
-      initializeWeatherWithLocation(false); // Never quiet on manual refresh
+      // Manual refresh - skip dial updates to avoid visual disruption
+      initializeWeatherWithLocation(false, true); // Add skipDialUpdate parameter
     });
   }
 }
@@ -651,13 +651,13 @@ function showWeatherPlaceholder() {
 }
 
 // Unified location determination flow used both on startup and manual refresh
-function initializeWeatherWithLocation(quietMode = false) {
+function initializeWeatherWithLocation(quietMode = false, skipDialUpdate = false) {
   // Step 1: Try to get location using the secure cache -> fetch -> failsafe flow
   determineUserLocation()
     .then(coords => {
       console.log('Location determined:', coords);
       // Step 2: Use the determined location to fetch weather
-      fetchWeatherData(false, quietMode, coords);
+      fetchWeatherData(false, quietMode, coords, skipDialUpdate);
     })
     .catch(error => {
       console.error('Failed to determine location:', error);
@@ -709,7 +709,7 @@ function determineUserLocation() {
   });
 }
 
-function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates = null) {
+function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates = null, skipDialUpdate = false) {
   // We should always have coordinates by this point from determineUserLocation
   if (!coordinates) {
     console.error('fetchWeatherData called without coordinates');
@@ -743,7 +743,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
     .then(data => {
       // Save to cache and display
       cacheWeatherData(data);
-      displayWeatherData(data, false, forceRefresh);
+      displayWeatherData(data, false, skipDialUpdate); // Pass skipDialUpdate instead of forceRefresh
     })
     .catch(error => {
       console.error('Error fetching weather:', error);
