@@ -141,9 +141,6 @@ const weatherIcon = document.getElementById('weatherIcon');
 const temperatureElement = document.getElementById('temperature');
 const feelsLikeElement = document.getElementById('feelsLike');
 const weatherConditionElement = document.getElementById('weatherCondition');
-const locationElement = document.getElementById('location');
-const sunriseElement = document.getElementById('sunrise');
-const sunsetElement = document.getElementById('sunset');
 
 // Weather configuration
 const WEATHER_CONFIG = {
@@ -338,7 +335,7 @@ function checkIsDayTimeForTimezone(timezone) {
 
 // Update day/night dials for both timezones
 function updateDayNightDials() {
-  // Update dial 1 (first timezone)
+  // Update dial 1 (Sweden timezone)
   const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
   const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
   
@@ -353,7 +350,7 @@ function updateDayNightDials() {
     moonIcon1.style.transform = isDay1 ? 'rotate(90deg)' : 'rotate(0deg)';
   }
   
-  // Update dial 2 (local time or timezone)
+  // Update dial 2 (local time)
   const clock2Timezone = CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone;
   const rotationAngle2 = getCurrentHourAngleForTimezone(clock2Timezone);
   const isDay2 = checkIsDayTimeForTimezone(clock2Timezone);
@@ -451,23 +448,6 @@ function updateTimeWithTransition(newTimeString, timeElement) {
 
     timeElement.appendChild(digitSpan);
   });
-}
-
-// Day/Night dial updater
-function updateDayNightDial(now) {
-  // Rotate dial based on current hour
-  const rotationAngle = getCurrentHourAngle();
-  dialRing.style.transform = `rotate(${rotationAngle}deg)`;
-
-  // Update sun/moon visibility based on time
-  const isDay = checkIsDayTime(now);
-
-  // Set proper state for sun/moon icons without transition for initial load
-  sunIcon.style.opacity = isDay ? 1 : 0;
-  sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
-
-  moonIcon.style.opacity = isDay ? 0 : 1;
-  moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
 }
 
 // Remove the old updateDayNightDialWithSunData function entirely and replace with this:
@@ -722,7 +702,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
   // Check if we have cached weather data (unless forcing refresh)
   const cachedWeatherData = forceRefresh ? null : getCachedWeatherData();
   if (cachedWeatherData && !forceRefresh) {
-    displayWeatherData(cachedWeatherData);
+    displayWeatherData(cachedWeatherData, true, skipDialUpdate); // Pass skipDialUpdate parameter
     return;
   }
 
@@ -898,17 +878,9 @@ function displayWeatherError() {
   if (temperatureElement) temperatureElement.textContent = '--°';
   if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
   if (weatherConditionElement) weatherConditionElement.textContent = 'Weather Unavailable';
-  if (locationElement) locationElement.textContent = 'Try again later';
-  if (sunriseElement) {
-    const sunriseContent = sunriseElement.innerHTML.split('</svg>')[0] + '</svg>--:--';
-    sunriseElement.innerHTML = sunriseContent;
-  }
-  if (sunsetElement) {
-    const sunsetContent = sunsetElement.innerHTML.split('</svg>')[0] + '</svg>--:--';
-    sunsetElement.innerHTML = sunsetContent;
-  }
 }
 
+// Cache weather data
 function cacheWeatherData(data) {
   try {
     const cachedItem = {
