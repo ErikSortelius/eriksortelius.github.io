@@ -701,6 +701,9 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
 
   const apiUrl = `https://api.openweathermap.org/data/2.5/weather?lat=${coordinates.latitude}&lon=${coordinates.longitude}&units=${WEATHER_CONFIG.units}&appid=${WEATHER_CONFIG.apiKey}`;
 
+  console.log(`🌤️ Fetching fresh weather data at ${new Date().toLocaleString()}`);
+  console.log(`📍 Location: ${coordinates.latitude.toFixed(4)}, ${coordinates.longitude.toFixed(4)}`);
+
   fetch(apiUrl)
     .then(response => {
       if (!response.ok) {
@@ -709,11 +712,18 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
       return response.json();
     })
     .then(data => {
+      console.log(`✅ Fresh weather data received at ${new Date().toLocaleString()}`);
+      console.log(`🌡️ Temperature: ${Math.round(data.main.temp)}°C (feels like ${Math.round(data.main.feels_like)}°C)`);
+      console.log(`☁️ Condition: ${data.weather[0].description}`);
+      console.log(`🏙️ Location: ${data.name}, ${data.sys.country}`);
+      console.log(`🌅 Sunrise: ${new Date(data.sys.sunrise * 1000).toLocaleTimeString()}`);
+      console.log(`🌇 Sunset: ${new Date(data.sys.sunset * 1000).toLocaleTimeString()}`);
+      
       // Just display the data - no caching
       displayWeatherData(data, false, skipDialUpdate);
     })
     .catch(error => {
-      console.error('Error fetching weather:', error);
+      console.error(`❌ Weather fetch failed at ${new Date().toLocaleString()}:`, error);
       if (!quietMode) {
         displayWeatherError();
       }
@@ -795,6 +805,9 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
     // Get sunrise and sunset times for day/night dial
     const sunrise = new Date(data.sys.sunrise * 1000);
     const sunset = new Date(data.sys.sunset * 1000);
+
+    console.log(`🔄 Weather UI updated at ${new Date().toLocaleString()}`);
+    console.log(`📊 Displayed: ${temperature}°C, ${data.weather[0].description}, ${iconName} icon`);
 
     // Update UI
     if (weatherIcon) weatherIcon.innerHTML = icons[iconName];
