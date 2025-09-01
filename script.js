@@ -597,28 +597,22 @@ function setupSearchInput() {
 
 // Weather functions - restructured for better flow
 function setupWeather() {
-  // First, immediately try to show cached weather
-  const cachedWeatherData = getCachedWeatherData();
-  if (cachedWeatherData) {
-    displayWeatherData(cachedWeatherData, true);
-  } else {
-    // Show placeholder if no cache
-    showWeatherPlaceholder();
-  }
+  // Show placeholder immediately
+  showWeatherPlaceholder();
   
-  // Then defer location determination and weather loading until page is interactive
+  // Then fetch weather data
   const deferWeatherLoad = window.requestIdleCallback || 
     ((cb) => setTimeout(cb, 1000));
   
   deferWeatherLoad(() => {
-    initializeWeatherWithLocation(cachedWeatherData ? true : false);
+    initializeWeatherWithLocation(false); // Always fetch fresh
   });
 
   // Add event listener to weather icon for manual refresh
   if (weatherIcon) {
     weatherIcon.addEventListener('click', () => {
       // Manual refresh - skip dial updates to avoid visual disruption
-      initializeWeatherWithLocation(false, true); // Add skipDialUpdate parameter
+      initializeWeatherWithLocation(false, true);
     });
   }
 }
@@ -636,8 +630,8 @@ function initializeWeatherWithLocation(quietMode = false, skipDialUpdate = false
   determineUserLocation()
     .then(coords => {
       console.log('Location determined:', coords);
-      // Step 2: Use the determined location to fetch weather
-      fetchWeatherData(false, quietMode, coords, skipDialUpdate);
+      // Step 2: Use the determined location to fetch weather (always fresh)
+      fetchWeatherData(true, quietMode, coords, skipDialUpdate); // Always force refresh
     })
     .catch(error => {
       console.error('Failed to determine location:', error);
@@ -699,13 +693,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
     return;
   }
 
-  // Check if we have cached weather data (unless forcing refresh)
-  const cachedWeatherData = forceRefresh ? null : getCachedWeatherData();
-  if (cachedWeatherData && !forceRefresh) {
-    displayWeatherData(cachedWeatherData, true, skipDialUpdate); // Pass skipDialUpdate parameter
-    return;
-  }
-
+  // Always fetch fresh weather data - no caching
   // Show loading state (unless in quiet mode)
   if (weatherIcon && !quietMode) {
     weatherIcon.innerHTML = `<div class="weather-loader"></div>`;
@@ -721,9 +709,8 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
       return response.json();
     })
     .then(data => {
-      // Save to cache and display
-      cacheWeatherData(data);
-      displayWeatherData(data, false, skipDialUpdate); // Pass skipDialUpdate instead of forceRefresh
+      // Just display the data - no caching
+      displayWeatherData(data, false, skipDialUpdate);
     })
     .catch(error => {
       console.error('Error fetching weather:', error);
@@ -878,39 +865,6 @@ function displayWeatherError() {
   if (temperatureElement) temperatureElement.textContent = '--°';
   if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
   if (weatherConditionElement) weatherConditionElement.textContent = 'Weather Unavailable';
-}
-
-// Cache weather data
-function cacheWeatherData(data) {
-  try {
-    const cachedItem = {
-      data: data,
-      timestamp: Date.now()
-    };
-    localStorage.setItem('weatherCache', JSON.stringify(cachedItem));
-  } catch (error) {
-    console.error('Error caching weather data:', error);
-  }
-}
-
-function getCachedWeatherData() {
-  try {
-    const cachedItem = localStorage.getItem('weatherCache');
-    if (!cachedItem) return null;
-
-    const { data, timestamp } = JSON.parse(cachedItem);
-    const now = Date.now();
-
-    // Check if cache is still valid
-    if (now - timestamp < WEATHER_CONFIG.cacheTimeMs) {
-      return data;
-    }
-
-    return null;
-  } catch (error) {
-    console.error('Error getting cached weather data:', error);
-    return null;
-  }
 }
 
 // Clean and focused entrance animations
