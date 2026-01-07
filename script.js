@@ -813,6 +813,9 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
     const sunrise = new Date(data.sys.sunrise * 1000);
     const sunset = new Date(data.sys.sunset * 1000);
 
+    // Get location name for tooltips
+    const locationTooltip = `${data.name}, ${data.sys.country}`;
+
     console.log(`🔄 Weather UI updated at ${new Date().toLocaleString()}`);
     console.log(`📊 Displayed: ${temperature}°C, ${data.weather[0].description}, ${iconName} icon`);
 
@@ -823,6 +826,12 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
       feelsLikeElement.textContent = `Realfeel: ${feelsLike}°`;
     }
     
+    // Add tooltip to Current Location label
+    if (clock2LabelElement && CLOCK_CONFIG.clock2.label === 'CURRENT LOCATION') {
+      clock2LabelElement.title = locationTooltip;
+      clock2LabelElement.style.cursor = 'help'; // Visual cue that hover has info
+    }
+
     // Set the temperature gradient based on "feels like" temperature
     setTemperatureGradient(feelsLike);
     
@@ -833,6 +842,7 @@ function displayWeatherData(data, fromCache = false, skipDialUpdate = false) {
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
       weatherConditionElement.textContent = description;
+      weatherConditionElement.title = locationTooltip; // Add tooltip here too
     }
 
     // Don't manipulate opacity here - let the entrance animation handle it
