@@ -365,7 +365,7 @@ body {
   background-color: var(--blue-accent-bg);
 }
 
-.link-section:has(.link-section-title.work):hover::before {
+.link-section:has(.link-section-title.finance):hover::before {
   background-color: var(--green-accent-bg);
 }
 
@@ -394,7 +394,7 @@ body {
   color: var(--blue-300);
 }
 
-.link-section:hover .link-section-title.work {
+.link-section:hover .link-section-title.finance {
   color: var(--green-300);
 }
 
