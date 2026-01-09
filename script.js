@@ -2,6 +2,8 @@
 
 // Animation state
 let initialAnimationComplete = false;
+let lastVocabIndex = -1;
+let lastGeoIndex = -1;
 
 // DOM elements
 const clock1TimeElement = document.getElementById('clock1Time');
@@ -871,6 +873,104 @@ function displayWeatherError() {
   }
 }
 
+/* Interactive Pills Functions */
+function loadRandomVocabulary() {
+  if (typeof VOCABULARY_DATA === 'undefined' || VOCABULARY_DATA.length === 0) return;
+  
+  let randomIndex;
+  // Try to find a new index that isn't the same as the last one
+  // Only loop if we have enough items to actually support non-repetition
+  if (VOCABULARY_DATA.length > 1) {
+    do {
+      randomIndex = Math.floor(Math.random() * VOCABULARY_DATA.length);
+    } while (randomIndex === lastVocabIndex);
+  } else {
+    randomIndex = 0;
+  }
+  
+  lastVocabIndex = randomIndex;
+  const data = VOCABULARY_DATA[randomIndex];
+  
+  const wordEl = document.getElementById('vocabWord');
+  const translationEl = document.getElementById('vocabTranslation');
+  
+  if (wordEl) wordEl.textContent = data.word;
+  if (translationEl) {
+    translationEl.textContent = data.translation;
+  }
+}
+
+function loadRandomGeography() {
+  if (typeof GEOGRAPHY_DATA === 'undefined' || GEOGRAPHY_DATA.length === 0) return;
+  
+  let randomIndex;
+  if (GEOGRAPHY_DATA.length > 1) {
+    do {
+      randomIndex = Math.floor(Math.random() * GEOGRAPHY_DATA.length);
+    } while (randomIndex === lastGeoIndex);
+  } else {
+    randomIndex = 0;
+  }
+  
+  lastGeoIndex = randomIndex;
+  const data = GEOGRAPHY_DATA[randomIndex];
+  
+  const countryEl = document.getElementById('geoCountry');
+  const capitalEl = document.getElementById('geoCapital');
+  const flagEl = document.getElementById('geoFlag');
+  
+  if (countryEl) countryEl.textContent = data.country;
+  if (capitalEl) {
+    capitalEl.textContent = data.capital;
+  }
+  
+  if (flagEl) {
+    flagEl.src = `https://flagcdn.com/w80/${data.code.toLowerCase()}.png`;
+    flagEl.alt = `${data.country} Flag`;
+    flagEl.style.display = 'block';
+  }
+}
+
+function initInteractivePills() {
+  // Initialize data
+  loadRandomVocabulary();
+  loadRandomGeography();
+  
+  // Vocabulary Pill Listener
+  const vocabWidget = document.getElementById('vocabWidget');
+  if (vocabWidget) {
+    vocabWidget.addEventListener('click', function() {
+      if (this.classList.contains('revealed')) {
+        // Reload if already revealed
+        this.classList.remove('revealed');
+        setTimeout(() => {
+          loadRandomVocabulary();
+        }, 300);
+      } else {
+        // Reveal
+        this.classList.add('revealed');
+      }
+    });
+  }
+
+  // Geography Pill Listener
+  const geoWidget = document.getElementById('geoWidget');
+  if (geoWidget) {
+    geoWidget.addEventListener('click', function() {
+      if (this.classList.contains('revealed')) {
+        // Reload
+        this.classList.remove('revealed');
+        setTimeout(() => {
+          loadRandomGeography();
+        }, 300);
+      } else {
+        // Reveal
+        this.classList.add('revealed');
+      }
+    });
+  }
+}
+
 // Clean and focused entrance animations
 function performEntranceAnimations() {
   const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
@@ -985,12 +1085,13 @@ function performEntranceAnimations() {
     weatherContainer.style.visibility = 'visible';
   }
 
-  // Initial state for stock widget
-  if (stockWidget) {
-    stockWidget.style.transition = 'none';
-    stockWidget.style.opacity = '0';
-    stockWidget.style.transform = 'translateY(20px)';
-  }
+  // Initial state for interactive pills
+  const interactivePills = document.querySelectorAll('.interactive-pill');
+  interactivePills.forEach(pill => {
+    pill.style.transition = 'none';
+    pill.style.opacity = '0';
+    pill.style.transform = 'translateY(20px)';
+  });
 
   // Force browser reflow
   document.body.offsetHeight;
@@ -1053,12 +1154,15 @@ function performEntranceAnimations() {
       weatherContainer.style.transform = 'translateY(0)';
     }
 
-    // New: Stock Widget Animation
-    if (stockWidget) {
-      stockWidget.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-      stockWidget.style.opacity = '1';
-      stockWidget.style.transform = 'translateY(0)';
-    }
+    // New: Interactive Pills Animation
+    const pillsToAnimate = document.querySelectorAll('.interactive-pill');
+    pillsToAnimate.forEach((pill, index) => {
+      setTimeout(() => {
+        pill.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+        pill.style.opacity = '1';
+        pill.style.transform = 'translateY(0)';
+      }, index * 80); // Slight stagger
+    });
 
     // 6. Animate both marker dots - delayed start after 1200ms
     setTimeout(() => {
@@ -1097,6 +1201,9 @@ function init() {
 
   // Fetch Stock Data
   fetchStockData();
+
+  // Initialize Interactive Pills
+  initInteractivePills();
 
   // Add event listener to stock widget for manual refresh
   if (stockWidget) {
