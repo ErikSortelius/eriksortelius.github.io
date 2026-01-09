@@ -47,6 +47,7 @@ function fetchStockData(forceRefresh = false) {
 
   // Use config symbol
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
+  const displayName = "GRANGEX"; // Fixed display name for UI
 
   // Check cache (unless forcing refresh)
   if (!forceRefresh) {
@@ -75,14 +76,8 @@ function fetchStockData(forceRefresh = false) {
         const result = data.chart.result[0];
         const meta = result.meta;
         const currentPrice = meta.regularMarketPrice;
-        // API creates ambiguity: some endpoints use previousClose, others chartPreviousClose
         const previousClose = meta.chartPreviousClose || meta.previousClose;
-        
-        // Use shortName (e.g., "GRANGEX AB") but fallback to symbol if missing
-        // Optional: Clean up " AB" from the name for cleaner UI
-        const displayName = meta.shortName ? meta.shortName.replace(' AB', '') : symbol;
 
-        // Calculate Change safely
         let changePercent = 0;
         if (typeof currentPrice === 'number' && typeof previousClose === 'number' && previousClose !== 0) {
           const change = currentPrice - previousClose;
@@ -90,7 +85,7 @@ function fetchStockData(forceRefresh = false) {
         }
 
         const stockData = {
-          symbol: displayName, // Store user-friendly name
+          symbol: displayName,
           price: currentPrice || 0,
           changePercent: changePercent,
           timestamp: Date.now()
@@ -122,10 +117,17 @@ function updateStockUI(data) {
 
   // Update classes for color
   stockChangeElement.classList.remove('positive', 'negative');
+  // Also update parent widget wrapper if it exists
+  if (stockWidget) {
+    stockWidget.classList.remove('positive', 'negative');
+  }
+
   if (change >= 0) {
     stockChangeElement.classList.add('positive');
+    if (stockWidget) stockWidget.classList.add('positive');
   } else {
     stockChangeElement.classList.add('negative');
+    if (stockWidget) stockWidget.classList.add('negative');
   }
 }
 
