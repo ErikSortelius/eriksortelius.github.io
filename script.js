@@ -75,7 +75,12 @@ function fetchStockData(forceRefresh = false) {
         const result = data.chart.result[0];
         const meta = result.meta;
         const currentPrice = meta.regularMarketPrice;
-        const previousClose = meta.previousClose;
+        // API creates ambiguity: some endpoints use previousClose, others chartPreviousClose
+        const previousClose = meta.chartPreviousClose || meta.previousClose;
+        
+        // Use shortName (e.g., "GRANGEX AB") but fallback to symbol if missing
+        // Optional: Clean up " AB" from the name for cleaner UI
+        const displayName = meta.shortName ? meta.shortName.replace(' AB', '') : symbol;
 
         // Calculate Change safely
         let changePercent = 0;
@@ -85,7 +90,7 @@ function fetchStockData(forceRefresh = false) {
         }
 
         const stockData = {
-          symbol: symbol,
+          symbol: displayName, // Store user-friendly name
           price: currentPrice || 0,
           changePercent: changePercent,
           timestamp: Date.now()
