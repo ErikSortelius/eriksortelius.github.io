@@ -43,10 +43,10 @@ const weatherConditionElement = document.getElementById('weatherCondition');
 
 // Stock functions
 function fetchStockData() {
-  if (!stockWidget || !STOCK_CONFIG.apiKey) {
-    if (stockWidget) stockWidget.style.display = 'none'; // Hide if no config
-    return;
-  }
+  if (!stockWidget) return;
+  
+  // Use config symbol
+  const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
   
   // Check cache
   const cachedStock = getCachedStockData();
@@ -54,36 +54,49 @@ function fetchStockData() {
     updateStockUI(cachedStock);
     return;
   }
+  
+  // CORS Proxy logic to fetch simplified Yahoo Finance Data
+  // We use query1.finance.yahoo.com/v8/finance/chart/SYMBOL
+  const proxyUrl = 'https://corsproxy.io/?';
+  const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+  
+  console.log(`📈 Fetching stock data for ${symbol} via proxy...`);
 
-  // Fetch logic using Finnhub or similar standard
-  const symbol = STOCK_CONFIG.symbol;
-  const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${STOCK_CONFIG.apiKey}`;
-
-  console.log(`📈 Fetching stock data for ${symbol}...`);
-
-  fetch(url)
+  fetch(proxyUrl + encodeURIComponent(targetUrl))
     .then(response => {
-      if (!response.ok) throw new Error('Stock API Error');
+      if (!response.ok) throw new Error('Stock Proxy API Error');
       return response.json();
     })
     .then(data => {
-      // Finnhub returns { c: current, d: change, dp: percent change, ... }
-      if (!data.c) throw new Error('Invalid Stock Data');
-      
-      const stockData = {
-        symbol: symbol,
-        price: data.c,
-        changePercent: data.dp,
-        timestamp: Date.now()
-      };
-      
-      cacheStockData(stockData);
-      updateStockUI(stockData);
+      // Parse Yahoo Finance Response
+      try {
+        const result = data.chart.result[0];
+        const meta = result.meta;
+        const currentPrice = meta.regularMarketPrice;
+        const previousClose = meta.previousClose;
+        
+        // Calculate Change
+        const change = currentPrice - previousClose;
+        const changePercent = (change / previousClose) * 100;
+        
+        const stockData = {
+          symbol: symbol,
+          price: currentPrice,
+          changePercent: changePercent,
+          timestamp: Date.now()
+        };
+        
+        cacheStockData(stockData);
+        updateStockUI(stockData);
+      } catch (e) {
+        throw new Error('Invalid Yahoo Data Structure');
+      }
     })
     .catch(err => {
       console.error('Stock fetch failed:', err);
-      // Optional: keep showing loading state or hide
-      stockWidget.style.opacity = '0.5'; 
+      // Fallback UI or stay hidden
+      if (stockPriceElement) stockPriceElement.textContent = '--.--';
+      if (stockChangeElement) stockChangeElement.textContent = '--%';
     });
 }
 
