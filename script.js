@@ -375,15 +375,76 @@ function createLinkSections() {
   });
 }
 
+// Handle search logic
+function handleSearch(e) {
+  e.preventDefault();
+  
+  const query = searchInput.value.trim();
+  if (!query) return;
+
+  const parts = query.split(' ');
+  const command = parts[0].toLowerCase();
+  
+  if (SEARCH_COMMANDS[command]) {
+    const searchProvider = SEARCH_COMMANDS[command];
+    const actualQuery = query.substring(command.length).trim();
+    
+    if (actualQuery) {
+      window.location.href = searchProvider.url + encodeURIComponent(actualQuery);
+    } else {
+       // Revert to standard google search if no query text provided
+       window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    }
+  } else {
+    window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+  }
+}
+
+function updateSearchVisuals() {
+  const query = searchInput.value;
+  const parts = query.split(' ');
+  const command = parts[0].toLowerCase();
+  const searchIcon = document.querySelector('.search-icon');
+  
+  if (!searchIcon) return;
+
+  // Visual cue triggers when a valid command is followed by space
+  if (query.length > 0 && SEARCH_COMMANDS[command] && (query.indexOf(' ') === command.length)) {
+    const provider = SEARCH_COMMANDS[command];
+    searchIcon.innerHTML = icons[provider.icon] || icons.search;
+    searchIcon.classList.add('active-command'); // Could add a class for extra styling
+    searchInput.placeholder = `Search ${provider.label}...`;
+  } else {
+    // Reset to default
+    if (searchIcon.innerHTML !== icons.search) {
+       searchIcon.innerHTML = icons.search;
+       searchIcon.classList.remove('active-command'); 
+       searchInput.placeholder = 'Google...';
+    }
+  }
+}
+
 // Handle search input focus
 function setupSearchInput() {
-  // Auto focus on page load after a short delay to allow transitions to complete
-  setTimeout(() => {
-    if (searchInput) {
+  if (searchForm) {
+    searchForm.addEventListener('submit', handleSearch);
+  }
+
+  if (searchInput) {
+    // Generate tooltip from config
+    const shortcuts = Object.entries(SEARCH_COMMANDS)
+      .map(([key, cmd]) => `'${key} ' for ${cmd.label}`)
+      .join(', ');
+    searchInput.title = `Shortcuts: ${shortcuts}`;
+
+    searchInput.addEventListener('input', updateSearchVisuals);
+    
+    // Auto focus on page load after a short delay to allow transitions to complete
+    setTimeout(() => {
       searchInput.focus();
-    }
-  }, 500);
-}
+    }, 500);
+  }
+} // End setupSearchInput
 
 // Weather functions - restructured for better flow
 function setupWeather() {
@@ -611,7 +672,8 @@ function displayWeatherData(data, fromCache = false) {
       }
       
       const country = data.sys.country ? data.sys.country : '';
-      const labelText = city ? (country ? `${city}, ${country}` : city) : '';
+      // We already show the flag, so we just need the city name
+      const labelText = city || '';
       
       if (labelText) {
         updateClockLabelWithFlag(clock2LabelElement, labelText, country);
