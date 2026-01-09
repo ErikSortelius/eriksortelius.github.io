@@ -972,6 +972,13 @@ function performEntranceAnimations() {
     weatherContainer.style.transform = 'translateY(20px)';
     weatherContainer.style.visibility = 'visible';
   }
+
+  // Initial state for stock widget
+  if (stockWidget) {
+    stockWidget.style.transition = 'none';
+    stockWidget.style.opacity = '0';
+    stockWidget.style.transform = 'translateY(20px)';
+  }
   
   // Force browser reflow
   document.body.offsetHeight;
