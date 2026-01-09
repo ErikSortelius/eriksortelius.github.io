@@ -126,7 +126,7 @@ const SEARCH_COMMANDS = {
  * STOCK CONFIGURATION
  */
 const STOCK_CONFIG = {
-  symbol: 'GRANX',
+  symbol: 'GRANGX.ST', // .ST suffix for First North Stockholm
   apiKey: 'd5gfcjpr01qte96t1e9gd5gfcjpr01qte96t1ea0',
   cacheTimeMs: 15 * 60 * 1000
 };
