@@ -28,12 +28,106 @@ const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
 const searchForm = document.getElementById('searchForm');
 
+// Stock elements
+const stockWidget = document.getElementById('stockWidget');
+const stockSymbolElement = document.getElementById('stockSymbol');
+const stockPriceElement = document.getElementById('stockPrice');
+const stockChangeElement = document.getElementById('stockChange');
+
 // Weather elements
 const weatherContainer = document.querySelector('.weather-container');
 const weatherIcon = document.getElementById('weatherIcon');
 const temperatureElement = document.getElementById('temperature');
 const feelsLikeElement = document.getElementById('feelsLike');
 const weatherConditionElement = document.getElementById('weatherCondition');
+
+// Stock functions
+function fetchStockData() {
+  if (!stockWidget || !STOCK_CONFIG.apiKey) {
+    if (stockWidget) stockWidget.style.display = 'none'; // Hide if no config
+    return;
+  }
+  
+  // Check cache
+  const cachedStock = getCachedStockData();
+  if (cachedStock) {
+    updateStockUI(cachedStock);
+    return;
+  }
+
+  // Fetch logic using Finnhub or similar standard
+  const symbol = STOCK_CONFIG.symbol;
+  const url = `https://finnhub.io/api/v1/quote?symbol=${symbol}&token=${STOCK_CONFIG.apiKey}`;
+
+  console.log(`📈 Fetching stock data for ${symbol}...`);
+
+  fetch(url)
+    .then(response => {
+      if (!response.ok) throw new Error('Stock API Error');
+      return response.json();
+    })
+    .then(data => {
+      // Finnhub returns { c: current, d: change, dp: percent change, ... }
+      if (!data.c) throw new Error('Invalid Stock Data');
+      
+      const stockData = {
+        symbol: symbol,
+        price: data.c,
+        changePercent: data.dp,
+        timestamp: Date.now()
+      };
+      
+      cacheStockData(stockData);
+      updateStockUI(stockData);
+    })
+    .catch(err => {
+      console.error('Stock fetch failed:', err);
+      // Optional: keep showing loading state or hide
+      stockWidget.style.opacity = '0.5'; 
+    });
+}
+
+function updateStockUI(data) {
+  if (!stockSymbolElement || !stockPriceElement || !stockChangeElement) return;
+  
+  stockSymbolElement.textContent = data.symbol;
+  stockPriceElement.textContent = data.price.toFixed(2);
+  
+  const change = data.changePercent;
+  const sign = change >= 0 ? '+' : '';
+  stockChangeElement.textContent = `${sign}${change.toFixed(2)}%`;
+  
+  // Update classes for color
+  stockChangeElement.classList.remove('positive', 'negative');
+  if (change >= 0) {
+    stockChangeElement.classList.add('positive');
+  } else {
+    stockChangeElement.classList.add('negative');
+  }
+}
+
+function cacheStockData(data) {
+  try {
+    localStorage.setItem(`stock_cache_${data.symbol}`, JSON.stringify(data));
+  } catch (e) { console.error('Cache error', e); }
+}
+
+function getCachedStockData() {
+  try {
+    const symbol = STOCK_CONFIG.symbol;
+    const raw = localStorage.getItem(`stock_cache_${symbol}`);
+    if (!raw) return null;
+    
+    const data = JSON.parse(raw);
+    const age = Date.now() - data.timestamp;
+    
+    if (age > STOCK_CONFIG.cacheTimeMs) {
+      console.log('Stock cache expired');
+      return null;
+    }
+    return data;
+  } catch(e) { return null; }
+}
 
 // Location caching functions
 function cacheLocationData(coords) {
@@ -926,6 +1020,13 @@ function performEntranceAnimations() {
       weatherContainer.style.opacity = '1';
       weatherContainer.style.transform = 'translateY(0)';
     }
+
+    // New: Stock Widget Animation
+    if (stockWidget) {
+       stockWidget.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+       stockWidget.style.opacity = '1';
+       stockWidget.style.transform = 'translateY(0)';
+    }
     
     // 6. Animate both marker dots - delayed start after 1200ms
     setTimeout(() => {
@@ -962,6 +1063,9 @@ function init() {
   // Setup weather with cached data first
   setupWeather();
   
+  // Fetch Stock Data
+  fetchStockData();
+
   // Perform entrance animations last, based on available data
   performEntranceAnimations();
 }

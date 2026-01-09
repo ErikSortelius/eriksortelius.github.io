@@ -123,6 +123,15 @@ const SEARCH_COMMANDS = {
 };
 
 /**
+ * STOCK CONFIGURATION
+ */
+const STOCK_CONFIG = {
+  symbol: 'GRANX',
+  apiKey: 'd5gfcjpr01qte96t1e9gd5gfcjpr01qte96t1ea0',
+  cacheTimeMs: 15 * 60 * 1000
+};
+
+/**
  * WEATHER ICON MAPPING - OpenWeatherMap codes to SVG icons
  */
 const weatherIconMap = {
