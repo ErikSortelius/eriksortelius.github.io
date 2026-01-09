@@ -4,7 +4,8 @@
 const CLOCK_CONFIG = {
   clock1: {
     timezone: 'Europe/Stockholm',
-    label: 'SWEDEN'
+    label: 'SWEDEN',
+    countryCode: 'SE'
   },
   clock2: {
     useLocalTime: true,

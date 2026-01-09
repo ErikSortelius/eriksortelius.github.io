@@ -187,6 +187,27 @@ function checkIsDayTimeForTimezone(timezone) {
   return hours >= 6 && hours < 21;
 }
 
+// Helper to update clock label with country flag
+function updateClockLabelWithFlag(element, labelText, countryCode) {
+  if (!element) return;
+  
+  element.innerHTML = '';
+  element.classList.add('with-flag');
+  
+  if (countryCode) {
+    const flagImg = document.createElement('img');
+    flagImg.src = `https://flagcdn.com/h24/${countryCode.toLowerCase()}.png`;
+    flagImg.alt = countryCode;
+    flagImg.className = 'country-flag';
+    // Add small delay to loading to prevent layout shifts if possible, or just standard load
+    element.appendChild(flagImg);
+  }
+  
+  const textSpan = document.createElement('span');
+  textSpan.textContent = labelText;
+  element.appendChild(textSpan);
+}
+
 // Helper to update a single dial based on timezone and DOM elements
 function updateSingleDial(dialRing, sunIcon, moonIcon, timezone) {
   if (!dialRing || !sunIcon || !moonIcon) return;
@@ -582,11 +603,18 @@ function displayWeatherData(data, fromCache = false) {
     
     // Update "Current Location" label to actual city name and add tooltip
     if (clock2LabelElement && CLOCK_CONFIG.clock2.useLocalTime) {
-      const city = data.name ? data.name.toUpperCase() : '';
-      const country = data.sys.country ? data.sys.country.toUpperCase() : '';
+      let city = data.name ? data.name.toUpperCase() : '';
       
-      if (city) {
-        clock2LabelElement.textContent = country ? `${city}, ${country}` : city;
+      // Truncate overly long city names
+      if (city.length > 16) {
+        city = city.substring(0, 14) + '..';
+      }
+      
+      const country = data.sys.country ? data.sys.country : '';
+      const labelText = city ? (country ? `${city}, ${country}` : city) : '';
+      
+      if (labelText) {
+        updateClockLabelWithFlag(clock2LabelElement, labelText, country);
       }
       
       clock2LabelElement.title = locationTooltip;
@@ -656,7 +684,7 @@ function displayWeatherError() {
 
   // Revert label to fallback on error
   if (clock2LabelElement && CLOCK_CONFIG.clock2.useLocalTime) {
-    clock2LabelElement.textContent = CLOCK_CONFIG.clock2.label;
+    updateClockLabelWithFlag(clock2LabelElement, CLOCK_CONFIG.clock2.label, null);
     clock2LabelElement.title = '';
     clock2LabelElement.style.cursor = 'inherit';
   }
@@ -743,11 +771,12 @@ function performEntranceAnimations() {
   
   // Set timezone labels
   if (clock1LabelElement) {
-    clock1LabelElement.textContent = CLOCK_CONFIG.clock1.label;
+    updateClockLabelWithFlag(clock1LabelElement, CLOCK_CONFIG.clock1.label, CLOCK_CONFIG.clock1.countryCode);
   }
   
   if (clock2LabelElement) {
-    clock2LabelElement.textContent = CLOCK_CONFIG.clock2.label;
+    // Initial state for clock 2 (will be updated by weather if available)
+    updateClockLabelWithFlag(clock2LabelElement, CLOCK_CONFIG.clock2.label, null);
   }
   
   // Set initial states for date elements
