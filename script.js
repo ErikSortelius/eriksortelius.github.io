@@ -42,24 +42,26 @@ const feelsLikeElement = document.getElementById('feelsLike');
 const weatherConditionElement = document.getElementById('weatherCondition');
 
 // Stock functions
-function fetchStockData() {
+function fetchStockData(forceRefresh = false) {
   if (!stockWidget) return;
-  
+
   // Use config symbol
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
-  
-  // Check cache
-  const cachedStock = getCachedStockData();
-  if (cachedStock) {
-    updateStockUI(cachedStock);
-    return;
+
+  // Check cache (unless forcing refresh)
+  if (!forceRefresh) {
+    const cachedStock = getCachedStockData();
+    if (cachedStock) {
+      updateStockUI(cachedStock);
+      return;
+    }
   }
-  
+
   // CORS Proxy logic to fetch simplified Yahoo Finance Data
   // We use query1.finance.yahoo.com/v8/finance/chart/SYMBOL
   const proxyUrl = 'https://corsproxy.io/?';
   const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
-  
+
   console.log(`📈 Fetching stock data for ${symbol} via proxy...`);
 
   fetch(proxyUrl + encodeURIComponent(targetUrl))
@@ -74,18 +76,21 @@ function fetchStockData() {
         const meta = result.meta;
         const currentPrice = meta.regularMarketPrice;
         const previousClose = meta.previousClose;
-        
-        // Calculate Change
-        const change = currentPrice - previousClose;
-        const changePercent = (change / previousClose) * 100;
-        
+
+        // Calculate Change safely
+        let changePercent = 0;
+        if (typeof currentPrice === 'number' && typeof previousClose === 'number' && previousClose !== 0) {
+          const change = currentPrice - previousClose;
+          changePercent = (change / previousClose) * 100;
+        }
+
         const stockData = {
           symbol: symbol,
-          price: currentPrice,
+          price: currentPrice || 0,
           changePercent: changePercent,
           timestamp: Date.now()
         };
-        
+
         cacheStockData(stockData);
         updateStockUI(stockData);
       } catch (e) {
@@ -102,14 +107,14 @@ function fetchStockData() {
 
 function updateStockUI(data) {
   if (!stockSymbolElement || !stockPriceElement || !stockChangeElement) return;
-  
+
   stockSymbolElement.textContent = data.symbol;
-  stockPriceElement.textContent = data.price.toFixed(2);
-  
-  const change = data.changePercent;
+  stockPriceElement.textContent = typeof data.price === 'number' ? data.price.toFixed(2) : '--.--';
+
+  const change = data.changePercent !== null ? data.changePercent : 0;
   const sign = change >= 0 ? '+' : '';
   stockChangeElement.textContent = `${sign}${change.toFixed(2)}%`;
-  
+
   // Update classes for color
   stockChangeElement.classList.remove('positive', 'negative');
   if (change >= 0) {
@@ -130,16 +135,16 @@ function getCachedStockData() {
     const symbol = STOCK_CONFIG.symbol;
     const raw = localStorage.getItem(`stock_cache_${symbol}`);
     if (!raw) return null;
-    
+
     const data = JSON.parse(raw);
     const age = Date.now() - data.timestamp;
-    
+
     if (age > STOCK_CONFIG.cacheTimeMs) {
       console.log('Stock cache expired');
       return null;
     }
     return data;
-  } catch(e) { return null; }
+  } catch (e) { return null; }
 }
 
 // Location caching functions
@@ -189,7 +194,7 @@ function getUserLocation() {
       reject(new Error('Geolocation is not supported by your browser'));
       return;
     }
-    
+
     navigator.geolocation.getCurrentPosition(
       (position) => {
         resolve({
@@ -264,14 +269,14 @@ function formatTimeForTimezone(timezone) {
 function getCurrentHourAngleForTimezone(timezone) {
   const now = new Date();
   let timeInTimezone;
-  
+
   if (!timezone) {
     // Use local time
     timeInTimezone = now;
   } else {
-    timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+    timeInTimezone = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
   }
-  
+
   const hours = timeInTimezone.getHours();
   const minutes = timeInTimezone.getMinutes();
   const totalHours = hours % 12 + minutes / 60;
@@ -281,14 +286,14 @@ function getCurrentHourAngleForTimezone(timezone) {
 function checkIsDayTimeForTimezone(timezone) {
   const now = new Date();
   let timeInTimezone;
-  
+
   if (!timezone) {
     // Use local time
     timeInTimezone = now;
   } else {
-    timeInTimezone = new Date(now.toLocaleString("en-US", {timeZone: timezone}));
+    timeInTimezone = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
   }
-  
+
   const hours = timeInTimezone.getHours();
   // Fixed Day Logic: Day is between 6 AM and 9 PM
   return hours >= 6 && hours < 21;
@@ -297,10 +302,10 @@ function checkIsDayTimeForTimezone(timezone) {
 // Helper to update clock label with country flag
 function updateClockLabelWithFlag(element, labelText, countryCode) {
   if (!element) return;
-  
+
   element.innerHTML = '';
   element.classList.add('with-flag');
-  
+
   if (countryCode) {
     const flagImg = document.createElement('img');
     flagImg.src = `https://flagcdn.com/h24/${countryCode.toLowerCase()}.png`;
@@ -309,7 +314,7 @@ function updateClockLabelWithFlag(element, labelText, countryCode) {
     // Add small delay to loading to prevent layout shifts if possible, or just standard load
     element.appendChild(flagImg);
   }
-  
+
   const textSpan = document.createElement('span');
   textSpan.textContent = labelText;
   element.appendChild(textSpan);
@@ -343,13 +348,13 @@ function updateDayNightDials() {
 // Initialize and Update Clocks
 function updateClock() {
   const now = new Date();
-  
+
   // Get times for both configured timezones/local
   const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const clock2TimeString = CLOCK_CONFIG.clock2.useLocalTime ? 
-    formatTimeForTimezone(null) : 
+  const clock2TimeString = CLOCK_CONFIG.clock2.useLocalTime ?
+    formatTimeForTimezone(null) :
     formatTimeForTimezone(CLOCK_CONFIG.clock2.timezone);
-  
+
   const dateString = formatDate(now);
   const weekdayString = getWeekday(now);
   const weekNumber = getWeekNumber(now);
@@ -395,7 +400,7 @@ function updateClock() {
 // Update time with smooth digit transitions
 function updateTimeWithTransition(newTimeString, timeElement) {
   if (!timeElement) return;
-  
+
   const currentTimeDigits = timeElement.textContent.split('');
   const newTimeDigits = newTimeString.split('');
 
@@ -430,47 +435,47 @@ function createLinkSections() {
     console.error('Links container element not found');
     return;
   }
-  
+
   categories.forEach((category, index) => {
     const section = document.createElement('div');
     section.className = 'link-section';
-    
+
     // Apply initial styles for animation
     section.style.opacity = '0';
     section.style.transform = 'translateY(20px)';
-    
+
     const title = document.createElement('h2');
     title.className = `link-section-title ${category.name.toLowerCase()}`;
     title.textContent = category.name;
-    
+
     const linkList = document.createElement('ul');
     linkList.className = 'link-list';
-    
+
     category.links.forEach(link => {
       const linkItem = document.createElement('li');
       linkItem.className = 'link-item';
-      
+
       const linkElement = document.createElement('a');
       linkElement.className = 'link';
       linkElement.href = link.url;
-      
+
       const iconSpan = document.createElement('span');
       iconSpan.className = 'link-icon';
       iconSpan.innerHTML = icons[link.icon] || icons.bookmark;
-      
+
       const linkText = document.createElement('span');
       linkText.textContent = link.name;
-      
+
       linkElement.appendChild(iconSpan);
       linkElement.appendChild(linkText);
       linkItem.appendChild(linkElement);
       linkList.appendChild(linkItem);
     });
-    
+
     section.appendChild(title);
     section.appendChild(linkList);
     linksContainer.appendChild(section);
-    
+
     // Animate each section with a staggered delay
     setTimeout(() => {
       requestAnimationFrame(() => {
@@ -485,22 +490,22 @@ function createLinkSections() {
 // Handle search logic
 function handleSearch(e) {
   e.preventDefault();
-  
+
   const query = searchInput.value.trim();
   if (!query) return;
 
   const parts = query.split(' ');
   const command = parts[0].toLowerCase();
-  
+
   if (SEARCH_COMMANDS[command]) {
     const searchProvider = SEARCH_COMMANDS[command];
     const actualQuery = query.substring(command.length).trim();
-    
+
     if (actualQuery) {
       window.location.href = searchProvider.url + encodeURIComponent(actualQuery);
     } else {
-       // Revert to standard google search if no query text provided
-       window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      // Revert to standard google search if no query text provided
+      window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
     }
   } else {
     window.location.href = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
@@ -512,7 +517,7 @@ function updateSearchVisuals() {
   const parts = query.split(' ');
   const command = parts[0].toLowerCase();
   const searchIcon = document.querySelector('.search-icon');
-  
+
   if (!searchIcon) return;
 
   // Visual cue triggers when a valid command is followed by space
@@ -524,9 +529,9 @@ function updateSearchVisuals() {
   } else {
     // Reset to default
     if (searchIcon.innerHTML !== icons.search) {
-       searchIcon.innerHTML = icons.search;
-       searchIcon.classList.remove('active-command'); 
-       searchInput.placeholder = 'Google...';
+      searchIcon.innerHTML = icons.search;
+      searchIcon.classList.remove('active-command');
+      searchInput.placeholder = 'Google...';
     }
   }
 }
@@ -545,7 +550,7 @@ function setupSearchInput() {
     searchInput.title = `Shortcuts: ${shortcuts}`;
 
     searchInput.addEventListener('input', updateSearchVisuals);
-    
+
     // Auto focus on page load after a short delay to allow transitions to complete
     setTimeout(() => {
       searchInput.focus();
@@ -557,11 +562,11 @@ function setupSearchInput() {
 function setupWeather() {
   // Show placeholder immediately
   showWeatherPlaceholder();
-  
+
   // Then fetch weather data
-  const deferWeatherLoad = window.requestIdleCallback || 
+  const deferWeatherLoad = window.requestIdleCallback ||
     ((cb) => setTimeout(cb, 1000));
-  
+
   deferWeatherLoad(() => {
     initializeWeatherWithLocation(false); // Always fetch fresh
   });
@@ -604,13 +609,13 @@ function determineUserLocation() {
   return new Promise((resolve, reject) => {
     // Step 1: Check for cached location coordinates
     const cachedLocation = getCachedLocationData();
-    
+
     if (cachedLocation) {
       console.log('Using cached location');
       resolve(cachedLocation);
       return;
     }
-    
+
     // Step 2: No cached location, try geolocation if enabled
     if (WEATHER_CONFIG.useGeolocation) {
       console.log('No cached location, requesting geolocation');
@@ -673,7 +678,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
       console.log(`✅ Fresh weather data received at ${new Date().toLocaleString()}`);
       console.log(`🌡️ Temperature: ${Math.round(data.main.temp)}°C (feels like ${Math.round(data.main.feels_like)}°C)`);
       console.log(`☁️ Condition: ${data.weather[0].description}`);
-      
+
       // Just display the data - no caching
       displayWeatherData(data, false);
     })
@@ -688,7 +693,7 @@ function fetchWeatherData(forceRefresh = false, quietMode = false, coordinates =
 // New function to set temperature gradient
 function setTemperatureGradient(temperature) {
   if (!weatherIcon) return;
-  
+
   // Updated temperature ranges
   // Freezing: below 0°C
   // Cold: 0°C to 10°C
@@ -699,7 +704,7 @@ function setTemperatureGradient(temperature) {
   // Scorching: above 39°C
   let color;
   let gradient;
-  
+
   if (temperature < 0) {
     gradient = 'linear-gradient(135deg, var(--temp-freezing-1), var(--temp-freezing-2))';
     color = 'var(--blue-300)';
@@ -722,25 +727,25 @@ function setTemperatureGradient(temperature) {
     gradient = 'linear-gradient(135deg, var(--temp-scorching-1), var(--temp-scorching-2))';
     color = 'var(--purple-300)'; // Using purple for scorching temperatures
   }
-  
+
   // Set the icon color
   weatherIcon.style.color = color;
-  
+
   // Also set the temperature text color to match
   if (temperatureElement) {
     temperatureElement.style.color = color;
   }
-  
+
   // Apply the gradient to the ::after pseudo-element
   const styleElem = document.createElement('style');
   styleElem.textContent = `.weather-icon::after { background: ${gradient}; }`;
-  
+
   // Remove any previous custom styles
   const oldStyle = document.getElementById('weather-gradient-style');
   if (oldStyle) {
     oldStyle.remove();
   }
-  
+
   // Add the new style
   styleElem.id = 'weather-gradient-style';
   document.head.appendChild(styleElem);
@@ -768,31 +773,31 @@ function displayWeatherData(data, fromCache = false) {
     if (feelsLikeElement) {
       feelsLikeElement.textContent = `Realfeel: ${feelsLike}°`;
     }
-    
+
     // Update "Current Location" label to actual city name and add tooltip
     if (clock2LabelElement && CLOCK_CONFIG.clock2.useLocalTime) {
       let city = data.name ? data.name.toUpperCase() : '';
-      
+
       // Truncate overly long city names
       if (city.length > 16) {
         city = city.substring(0, 14) + '..';
       }
-      
+
       const country = data.sys.country ? data.sys.country : '';
       // We already show the flag, so we just need the city name
       const labelText = city || '';
-      
+
       if (labelText) {
         updateClockLabelWithFlag(clock2LabelElement, labelText, country);
       }
-      
+
       clock2LabelElement.title = locationTooltip;
       clock2LabelElement.style.cursor = 'help'; // Visual cue that hover has info
     }
 
     // Set the temperature gradient based on "feels like" temperature
     setTemperatureGradient(feelsLike);
-    
+
     if (weatherConditionElement) {
       // Capitalize first letter of each word
       const description = data.weather[0].description
@@ -831,14 +836,14 @@ function displayWeatherError() {
     const styleElem = document.createElement('style');
     styleElem.textContent = `.weather-icon::after { background: linear-gradient(135deg, var(--temp-mild-1), var(--temp-mild-2)); }`;
     styleElem.id = 'weather-gradient-style';
-    
+
     const oldStyle = document.getElementById('weather-gradient-style');
     if (oldStyle) {
       oldStyle.remove();
     }
-    
+
     document.head.appendChild(styleElem);
-    
+
     // Set icon and temperature text color
     const color = 'var(--text-color-dim)';
     weatherIcon.style.color = color;
@@ -846,7 +851,7 @@ function displayWeatherError() {
       temperatureElement.style.color = color;
     }
   }
-  
+
   if (temperatureElement) temperatureElement.textContent = '--°';
   if (feelsLikeElement) feelsLikeElement.textContent = 'Realfeel: --°';
   if (weatherConditionElement) weatherConditionElement.textContent = 'Weather Unavailable';
@@ -866,106 +871,106 @@ function performEntranceAnimations() {
   const rotationAngle2 = getCurrentHourAngleForTimezone(clock2Timezone);
   const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
   const isDay2 = checkIsDayTimeForTimezone(clock2Timezone);
-  
+
   // Set initial states for both dials
   if (dialRing1) {
     dialRing1.style.transition = 'none';
     dialRing1.style.transform = 'rotate(0deg)';
   }
-  
+
   if (dialRing2) {
     dialRing2.style.transition = 'none';
     dialRing2.style.transform = 'rotate(0deg)';
   }
-  
+
   if (dialMarker1) {
     dialMarker1.style.transition = 'none';
     dialMarker1.style.opacity = '0';
     dialMarker1.style.transform = 'translate(-50%, -50%) scale(0)';
   }
-  
+
   if (dialMarker2) {
     dialMarker2.style.transition = 'none';
     dialMarker2.style.opacity = '0';
     dialMarker2.style.transform = 'translate(-50%, -50%) scale(0)';
   }
-  
+
   // Set initial states for sun/moon icons
   if (sunIcon1) {
     sunIcon1.style.transition = 'none';
     sunIcon1.style.opacity = '0';
     sunIcon1.style.transform = `rotate(${isDay1 ? -120 : 0}deg)`;
   }
-  
+
   if (moonIcon1) {
     moonIcon1.style.transition = 'none';
     moonIcon1.style.opacity = '0';
     moonIcon1.style.transform = `rotate(${isDay1 ? 0 : 120}deg)`;
   }
-  
+
   if (sunIcon2) {
     sunIcon2.style.transition = 'none';
     sunIcon2.style.opacity = '0';
     sunIcon2.style.transform = `rotate(${isDay2 ? -120 : 0}deg)`;
   }
-  
+
   if (moonIcon2) {
     moonIcon2.style.transition = 'none';
     moonIcon2.style.opacity = '0';
     moonIcon2.style.transform = `rotate(${isDay2 ? 0 : 120}deg)`;
   }
-  
+
   // Set initial state for time displays
   if (clock1TimeElement) {
     const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
     clock1TimeElement.innerHTML = '';
-    
+
     clock1TimeString.split('').forEach(digit => {
       const digitSpan = document.createElement('span');
       digitSpan.textContent = digit;
       clock1TimeElement.appendChild(digitSpan);
     });
   }
-  
+
   if (clock2TimeElement) {
     const clock2TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone);
     clock2TimeElement.innerHTML = '';
-    
+
     clock2TimeString.split('').forEach(digit => {
       const digitSpan = document.createElement('span');
       digitSpan.textContent = digit;
       clock2TimeElement.appendChild(digitSpan);
     });
   }
-  
+
   // Set timezone labels
   if (clock1LabelElement) {
     updateClockLabelWithFlag(clock1LabelElement, CLOCK_CONFIG.clock1.label, CLOCK_CONFIG.clock1.countryCode);
   }
-  
+
   if (clock2LabelElement) {
     // Initial state for clock 2 (will be updated by weather if available)
     updateClockLabelWithFlag(clock2LabelElement, CLOCK_CONFIG.clock2.label, null);
   }
-  
+
   // Set initial states for date elements
   if (dateElement) {
     dateElement.style.transition = 'none';
     dateElement.style.opacity = '0';
     dateElement.style.transform = 'translateY(20px)';
   }
-  
+
   if (weekdayElement) {
     weekdayElement.style.transition = 'none';
     weekdayElement.style.opacity = '0';
     weekdayElement.style.transform = 'translateY(15px)';
   }
-  
+
   if (weekNumberElement) {
     weekNumberElement.style.transition = 'none';
     weekNumberElement.style.opacity = '0';
   }
-  
+
   if (weatherContainer) {
     weatherContainer.style.transition = 'none';
     weatherContainer.style.opacity = '0';
@@ -979,10 +984,10 @@ function performEntranceAnimations() {
     stockWidget.style.opacity = '0';
     stockWidget.style.transform = 'translateY(20px)';
   }
-  
+
   // Force browser reflow
   document.body.offsetHeight;
-  
+
   // Start animations with updated timing
   requestAnimationFrame(() => {
     // 1. Animate both dial rings
@@ -990,35 +995,35 @@ function performEntranceAnimations() {
       dialRing1.style.transition = 'transform 1.8s ease-out';
       dialRing1.style.transform = `rotate(${rotationAngle1 + 360}deg)`;
     }
-    
+
     if (dialRing2) {
       dialRing2.style.transition = 'transform 1.8s ease-out';
       dialRing2.style.transform = `rotate(${rotationAngle2 + 360}deg)`;
     }
-    
+
     // 2. Fade in and rotate active icons for both dials
     const activeIcon1 = isDay1 ? sunIcon1 : moonIcon1;
     const activeIcon2 = isDay2 ? sunIcon2 : moonIcon2;
-    
+
     if (activeIcon1) {
       activeIcon1.style.transition = 'opacity 1s ease, transform 1.2s ease';
       activeIcon1.style.opacity = '1';
       activeIcon1.style.transform = 'rotate(0deg)';
     }
-    
+
     if (activeIcon2) {
       activeIcon2.style.transition = 'opacity 1s ease, transform 1.2s ease';
       activeIcon2.style.opacity = '1';
       activeIcon2.style.transform = 'rotate(0deg)';
     }
-    
+
     // 4. Animate date elements - starts immediately with 120ms stagger
     if (dateElement) {
       dateElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
       dateElement.style.opacity = '1';
       dateElement.style.transform = 'translateY(0)';
     }
-    
+
     setTimeout(() => {
       if (weekdayElement) {
         weekdayElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
@@ -1026,14 +1031,14 @@ function performEntranceAnimations() {
         weekdayElement.style.transform = 'translateY(0)';
       }
     }, 120);
-    
+
     setTimeout(() => {
       if (weekNumberElement) {
         weekNumberElement.style.transition = 'opacity 0.8s ease';
         weekNumberElement.style.opacity = '1';
       }
     }, 240);
-    
+
     // 5. Weather elements - starts immediately
     if (weatherContainer) {
       weatherContainer.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
@@ -1043,11 +1048,11 @@ function performEntranceAnimations() {
 
     // New: Stock Widget Animation
     if (stockWidget) {
-       stockWidget.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-       stockWidget.style.opacity = '1';
-       stockWidget.style.transform = 'translateY(0)';
+      stockWidget.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+      stockWidget.style.opacity = '1';
+      stockWidget.style.transform = 'translateY(0)';
     }
-    
+
     // 6. Animate both marker dots - delayed start after 1200ms
     setTimeout(() => {
       if (dialMarker1) {
@@ -1055,7 +1060,7 @@ function performEntranceAnimations() {
         dialMarker1.style.opacity = '1';
         dialMarker1.style.transform = 'translate(-50%, -50%) scale(1)';
       }
-      
+
       if (dialMarker2) {
         dialMarker2.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
         dialMarker2.style.opacity = '1';
@@ -1063,7 +1068,7 @@ function performEntranceAnimations() {
       }
     }, 1200);
   });
-  
+
   // Mark animation as complete after all animations have finished
   setTimeout(() => {
     initialAnimationComplete = true;
@@ -1075,16 +1080,25 @@ function init() {
   // Create link sections and setup search input first
   createLinkSections();
   setupSearchInput();
-  
+
   // Immediately update clocks
   updateClock();
   setInterval(updateClock, 1000);
-  
+
   // Setup weather with cached data first
   setupWeather();
-  
+
   // Fetch Stock Data
   fetchStockData();
+
+  // Add event listener to stock widget for manual refresh
+  if (stockWidget) {
+    stockWidget.addEventListener('click', () => {
+      // Visual feedback
+      if (stockPriceElement) stockPriceElement.textContent = '...';
+      fetchStockData(true);
+    });
+  }
 
   // Perform entrance animations last, based on available data
   performEntranceAnimations();
