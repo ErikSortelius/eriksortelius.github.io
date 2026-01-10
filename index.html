@@ -7,7 +7,6 @@
   <meta name="theme-color" content="#18181b">
   <title>Startpage</title>
   <link rel="stylesheet" href="styles.css">
-  <!-- Preload font for better performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -23,31 +22,6 @@
           <div class="clocks-container">
             <!-- Clock 1 -->
             <div class="clock-group">
-              <div class="day-night-dial" id="dial1">
-                <div class="dial-ring">
-                  <div class="dial-marker"></div>
-                </div>
-                <div class="sun-icon" id="sunIcon1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2"></path>
-                    <path d="M12 20v2"></path>
-                    <path d="m4.93 4.93 1.41 1.41"></path>
-                    <path d="m17.66 17.66 1.41 1.41"></path>
-                    <path d="M2 12h2"></path>
-                    <path d="M20 12h2"></path>
-                    <path d="m6.34 17.66-1.41 1.41"></path>
-                    <path d="m19.07 4.93-1.41 1.41"></path>
-                  </svg>
-                </div>
-                <div class="moon-icon" id="moonIcon1">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-                  </svg>
-                </div>
-              </div>
               <div class="clock clock1">
                 <h1 class="time" id="clock1Time">00:00</h1>
                 <span class="timezone-label" id="clock1Label">SWEDEN</span>
@@ -56,31 +30,6 @@
 
             <!-- Clock 2 -->
             <div class="clock-group">
-              <div class="day-night-dial" id="dial2">
-                <div class="dial-ring">
-                  <div class="dial-marker"></div>
-                </div>
-                <div class="sun-icon" id="sunIcon2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <circle cx="12" cy="12" r="4"></circle>
-                    <path d="M12 2v2"></path>
-                    <path d="M12 20v2"></path>
-                    <path d="m4.93 4.93 1.41 1.41"></path>
-                    <path d="m17.66 17.66 1.41 1.41"></path>
-                    <path d="M2 12h2"></path>
-                    <path d="M20 12h2"></path>
-                    <path d="m6.34 17.66-1.41 1.41"></path>
-                    <path d="m19.07 4.93-1.41 1.41"></path>
-                  </svg>
-                </div>
-                <div class="moon-icon" id="moonIcon2">
-                  <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
-                  </svg>
-                </div>
-              </div>
               <div class="clock clock2">
                 <h1 class="time" id="clock2Time">00:00</h1>
                 <span class="timezone-label" id="clock2Label">CURRENT LOCATION</span>
@@ -103,7 +52,7 @@
               <span class="weather-condition" id="weatherCondition">--</span>
             </div>
           </div>
-          
+
           <div class="date-info">
             <p class="date">April 14, 2025</p>
             <div class="weekday-info">
@@ -120,12 +69,11 @@
         <div class="interactive-pill stock-pill" id="stockWidget">
           <div class="pill-content">
             <span class="stock-symbol" id="stockSymbol">GRANGX</span>
-            <div class="stock-values">
-              <span class="stock-price" id="stockPrice">--.--</span>
-              <span class="stock-change" id="stockChange">--%</span>
-            </div>
+            <span class="stock-price" id="stockPrice">--.--</span>
           </div>
-          <div class="pill-label">Stock Market</div>
+          <div class="pill-label">
+            <span class="stock-change" id="stockChange">--%</span>
+          </div>
         </div>
 
         <!-- Pill 2: Vocabulary (New) -->

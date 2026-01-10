@@ -14,17 +14,7 @@ const dateElement = document.querySelector('.date');
 const weekdayElement = document.querySelector('.weekday');
 const weekNumberElement = document.querySelector('.week-number');
 
-// Dual dial elements
-const dial1 = document.getElementById('dial1');
-const dial2 = document.getElementById('dial2');
-const sunIcon1 = document.getElementById('sunIcon1');
-const moonIcon1 = document.getElementById('moonIcon1');
-const sunIcon2 = document.getElementById('sunIcon2');
-const moonIcon2 = document.getElementById('moonIcon2');
-const dialRing1 = dial1?.querySelector('.dial-ring');
-const dialRing2 = dial2?.querySelector('.dial-ring');
-const dialMarker1 = dial1?.querySelector('.dial-marker');
-const dialMarker2 = dial2?.querySelector('.dial-marker');
+// Dual dial elements - REMOVED
 
 const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
@@ -119,7 +109,7 @@ function updateStockUI(data) {
 
   // Update classes for color
   stockChangeElement.classList.remove('positive', 'negative');
-  // Also update parent widget wrapper if it exists
+  // Also update parent widget wrapper if it exists (stockWidget is defined at global scope)
   if (stockWidget) {
     stockWidget.classList.remove('positive', 'negative');
   }
@@ -275,38 +265,6 @@ function formatTimeForTimezone(timezone) {
   });
 }
 
-function getCurrentHourAngleForTimezone(timezone) {
-  const now = new Date();
-  let timeInTimezone;
-
-  if (!timezone) {
-    // Use local time
-    timeInTimezone = now;
-  } else {
-    timeInTimezone = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
-  }
-
-  const hours = timeInTimezone.getHours();
-  const minutes = timeInTimezone.getMinutes();
-  const totalHours = hours % 12 + minutes / 60;
-  return (totalHours / 12) * 360;
-}
-
-function checkIsDayTimeForTimezone(timezone) {
-  const now = new Date();
-  let timeInTimezone;
-
-  if (!timezone) {
-    // Use local time
-    timeInTimezone = now;
-  } else {
-    timeInTimezone = new Date(now.toLocaleString("en-US", { timeZone: timezone }));
-  }
-
-  const hours = timeInTimezone.getHours();
-  // Fixed Day Logic: Day is between 6 AM and 9 PM
-  return hours >= 6 && hours < 21;
-}
 
 // Helper to update clock label with country flag
 function updateClockLabelWithFlag(element, labelText, countryCode) {
@@ -329,30 +287,6 @@ function updateClockLabelWithFlag(element, labelText, countryCode) {
   element.appendChild(textSpan);
 }
 
-// Helper to update a single dial based on timezone and DOM elements
-function updateSingleDial(dialRing, sunIcon, moonIcon, timezone) {
-  if (!dialRing || !sunIcon || !moonIcon) return;
-
-  const rotationAngle = getCurrentHourAngleForTimezone(timezone);
-  const isDay = checkIsDayTimeForTimezone(timezone);
-
-  dialRing.style.transform = `rotate(${rotationAngle}deg)`;
-
-  sunIcon.style.opacity = isDay ? 1 : 0;
-  sunIcon.style.transform = isDay ? 'rotate(0deg)' : 'rotate(90deg)';
-  moonIcon.style.opacity = isDay ? 0 : 1;
-  moonIcon.style.transform = isDay ? 'rotate(90deg)' : 'rotate(0deg)';
-}
-
-// Update day/night dials for both timezones
-function updateDayNightDials() {
-  // Update dial 1 (Sweden timezone)
-  updateSingleDial(dialRing1, sunIcon1, moonIcon1, CLOCK_CONFIG.clock1.timezone);
-
-  // Update dial 2 (local time or configured timezone)
-  const clock2Timezone = CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone;
-  updateSingleDial(dialRing2, sunIcon2, moonIcon2, clock2Timezone);
-}
 
 // Initialize and Update Clocks
 function updateClock() {
@@ -426,8 +360,7 @@ function updateTimeWithTransition(newTimeString, timeElement) {
       digitSpan.style.transform = 'translateY(8px)';
 
       requestAnimationFrame(() => {
-        // Force reflow
-        digitSpan.offsetHeight;
+        Height;
         digitSpan.style.opacity = 1;
         digitSpan.style.transform = 'translateY(0)';
       });
@@ -552,12 +485,6 @@ function setupSearchInput() {
   }
 
   if (searchInput) {
-    // Generate tooltip from config
-    const shortcuts = Object.entries(SEARCH_COMMANDS)
-      .map(([key, cmd]) => `'${key} ' for ${cmd.label}`)
-      .join(', ');
-    searchInput.title = `Shortcuts: ${shortcuts}`;
-
     searchInput.addEventListener('input', updateSearchVisuals);
 
     // Auto focus on page load after a short delay to allow transitions to complete
@@ -876,7 +803,7 @@ function displayWeatherError() {
 /* Interactive Pills Functions */
 function loadRandomVocabulary() {
   if (typeof VOCABULARY_DATA === 'undefined' || VOCABULARY_DATA.length === 0) return;
-  
+
   let randomIndex;
   // Try to find a new index that isn't the same as the last one
   // Only loop if we have enough items to actually support non-repetition
@@ -887,13 +814,13 @@ function loadRandomVocabulary() {
   } else {
     randomIndex = 0;
   }
-  
+
   lastVocabIndex = randomIndex;
   const data = VOCABULARY_DATA[randomIndex];
-  
+
   const wordEl = document.getElementById('vocabWord');
   const translationEl = document.getElementById('vocabTranslation');
-  
+
   if (wordEl) wordEl.textContent = data.word;
   if (translationEl) {
     translationEl.textContent = data.translation;
@@ -902,7 +829,7 @@ function loadRandomVocabulary() {
 
 function loadRandomGeography() {
   if (typeof GEOGRAPHY_DATA === 'undefined' || GEOGRAPHY_DATA.length === 0) return;
-  
+
   let randomIndex;
   if (GEOGRAPHY_DATA.length > 1) {
     do {
@@ -911,19 +838,19 @@ function loadRandomGeography() {
   } else {
     randomIndex = 0;
   }
-  
+
   lastGeoIndex = randomIndex;
   const data = GEOGRAPHY_DATA[randomIndex];
-  
+
   const countryEl = document.getElementById('geoCountry');
   const capitalEl = document.getElementById('geoCapital');
   const flagEl = document.getElementById('geoFlag');
-  
+
   if (countryEl) countryEl.textContent = data.country;
   if (capitalEl) {
     capitalEl.textContent = data.capital;
   }
-  
+
   if (flagEl) {
     flagEl.src = `https://flagcdn.com/w80/${data.code.toLowerCase()}.png`;
     flagEl.alt = `${data.country} Flag`;
@@ -935,11 +862,11 @@ function initInteractivePills() {
   // Initialize data
   loadRandomVocabulary();
   loadRandomGeography();
-  
+
   // Vocabulary Pill Listener
   const vocabWidget = document.getElementById('vocabWidget');
   if (vocabWidget) {
-    vocabWidget.addEventListener('click', function() {
+    vocabWidget.addEventListener('click', function () {
       if (this.classList.contains('revealed')) {
         // Reload if already revealed
         this.classList.remove('revealed');
@@ -956,7 +883,7 @@ function initInteractivePills() {
   // Geography Pill Listener
   const geoWidget = document.getElementById('geoWidget');
   if (geoWidget) {
-    geoWidget.addEventListener('click', function() {
+    geoWidget.addEventListener('click', function () {
       if (this.classList.contains('revealed')) {
         // Reload
         this.classList.remove('revealed');
