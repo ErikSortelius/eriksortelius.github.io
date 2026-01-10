@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <!-- Bottom Row: Weather (left) and Date (right) -->
+        <!-- Bottom Row: Weather (left), Stock (center), and Date (right) -->
         <div class="bottom-section">
           <div class="weather-container">
             <div class="weather-icon" id="weatherIcon">
@@ -50,6 +50,17 @@
                 <span class="feels-like" id="feelsLike">Feels: --°</span>
               </div>
               <span class="weather-condition" id="weatherCondition">--</span>
+            </div>
+          </div>
+
+          <!-- Stock Section (Center) -->
+          <div class="stock-container" id="stockWidget">
+            <div class="stock-main">
+              <span class="stock-symbol" id="stockSymbol">GRANGX</span>
+              <span class="stock-price" id="stockPrice">--.--</span>
+            </div>
+            <div class="stock-details">
+              <span class="stock-change" id="stockChange" title="Click to refresh">--%</span>
             </div>
           </div>
 
@@ -65,18 +76,7 @@
 
       <!-- Interactive Pills Section -->
       <div class="interactive-pills-container">
-        <!-- Pill 1: Stock (Existing) -->
-        <div class="interactive-pill stock-pill" id="stockWidget">
-          <div class="pill-content">
-            <span class="stock-symbol" id="stockSymbol">GRANGX</span>
-            <span class="stock-price" id="stockPrice">--.--</span>
-          </div>
-          <div class="pill-label">
-            <span class="stock-change" id="stockChange">--%</span>
-          </div>
-        </div>
-
-        <!-- Pill 2: Vocabulary (New) -->
+        <!-- Pill 1: Vocabulary (Previously Pill 2) -->
         <div class="interactive-pill vocabulary-pill" id="vocabWidget">
           <div class="pill-content">
             <span class="pill-title" id="vocabWord">Bonjour</span>

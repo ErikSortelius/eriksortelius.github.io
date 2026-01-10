@@ -168,7 +168,7 @@ body {
 /* Interactive Pills Container and Items */
 .interactive-pills-container {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
   width: 100%;
   max-width: 48rem;
@@ -278,30 +278,58 @@ body {
   }
 }
 
-/* Stock Implementation Specifics */
-.stock-pill .pill-content {
+/* Stock Implementation Specifics (New Center Layout) */
+.stock-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: center;
+  flex: 1;
+  padding: 0 1rem;
+}
+
+.stock-main {
+  display: flex;
   align-items: baseline;
-  gap: 1rem;
-  margin-bottom: 0.1rem;
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
 }
 
 .stock-symbol {
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.5rem; /* Matches .date size */
+  font-weight: 400;  /* Matches .date weight usually */
   color: var(--text-color);
+  transition: all 0.3s ease-in-out;
 }
 
 .stock-price {
   font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  font-weight: 600;
+  font-size: 1.5rem;
+  font-weight: 400;
   color: var(--text-color);
 }
 
-.stock-pill .pill-label {
-  font-size: 0.9rem;
-  font-weight: 500;
+.stock-details {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stock-change {
+  font-size: 1.125rem; /* Matches .weekday size */
+  color: var(--text-color-dim);
+  cursor: pointer;
+  padding: 0.25rem 0.75rem; /* Slightly reduced vertical, increased horizontal for pill shape */
+  border-radius: 9999px; /* Fully rounded pill shape for the percentage tag */
+  transition: all 0.2s ease;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+}
+
+.stock-change:hover {
+  background-color: var(--bg-color-lighter);
+  border-color: var(--text-color-dim);
+  color: var(--text-color);
 }
 
 .stock-change.positive {
@@ -310,23 +338,6 @@ body {
 
 .stock-change.negative {
   color: var(--red-300);
-}
-
-/* Stock state colors (backgrounds) */
-.stock-pill.positive::before {
-  background-color: var(--green-accent-bg);
-}
-
-.stock-pill.negative::before {
-  background-color: var(--red-accent-bg);
-}
-
-.stock-pill.positive:hover::before {
-  background-color: rgba(134, 239, 172, 0.15);
-}
-
-.stock-pill.negative:hover::before {
-  background-color: rgba(252, 165, 165, 0.15);
 }
 
 /* Vocabulary/Geography Specifics */

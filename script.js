@@ -39,6 +39,22 @@ function fetchStockData(forceRefresh = false) {
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
   const displayName = "GRANGEX"; // Fixed display name for UI
 
+  // Add click listener to refresh on the change element
+  if (stockChangeElement) {
+    stockChangeElement.onclick = (e) => {
+      e.stopPropagation();
+      
+      // Add a small rotation effect or loading indicator class
+      stockChangeElement.style.opacity = '0.5';
+      fetchStockData(true);
+      
+      // Reset opacity after a short delay (updateStockUI will also handle this when data comes back)
+      setTimeout(() => {
+        stockChangeElement.style.opacity = '1';
+      }, 500);
+    };
+  }
+
   // Check cache (unless forcing refresh)
   if (!forceRefresh) {
     const cachedStock = getCachedStockData();
@@ -108,16 +124,16 @@ function updateStockUI(data) {
   // Update classes for color
   stockChangeElement.classList.remove('positive', 'negative');
   // Also update parent widget wrapper if it exists (stockWidget is defined at global scope)
-  if (stockWidget) {
-    stockWidget.classList.remove('positive', 'negative');
-  }
+  // if (stockWidget) {
+  //   stockWidget.classList.remove('positive', 'negative');
+  // }
 
   if (change >= 0) {
     stockChangeElement.classList.add('positive');
-    if (stockWidget) stockWidget.classList.add('positive');
+    // if (stockWidget) stockWidget.classList.add('positive');
   } else {
     stockChangeElement.classList.add('negative');
-    if (stockWidget) stockWidget.classList.add('negative');
+    // if (stockWidget) stockWidget.classList.add('negative');
   }
 }
 
