@@ -14,8 +14,6 @@ const dateElement = document.querySelector('.date');
 const weekdayElement = document.querySelector('.weekday');
 const weekNumberElement = document.querySelector('.week-number');
 
-// Dual dial elements - REMOVED
-
 const linksContainer = document.querySelector('.links-container');
 const searchInput = document.getElementById('searchInput');
 const searchForm = document.getElementById('searchForm');
@@ -335,9 +333,6 @@ function updateClock() {
   if (weekNumberElement) {
     weekNumberElement.textContent = `Week ${weekNumber}`;
   }
-
-  // Update dual day/night dials
-  updateDayNightDials();
 }
 
 // Update time with smooth digit transitions
@@ -360,7 +355,8 @@ function updateTimeWithTransition(newTimeString, timeElement) {
       digitSpan.style.transform = 'translateY(8px)';
 
       requestAnimationFrame(() => {
-        Height;
+        // Force reflow
+        digitSpan.offsetHeight;
         digitSpan.style.opacity = 1;
         digitSpan.style.transform = 'translateY(0)';
       });
@@ -757,9 +753,6 @@ function displayWeatherData(data, fromCache = false) {
         weatherContainer.classList.remove('weather-updated');
       }, 1000);
     }
-
-    // Note: Dial updates are now handled strictly by time in updateClock(),
-    // completely independent of weather data.
   } catch (error) {
     console.error('Error parsing weather data:', error);
     displayWeatherError();
@@ -900,60 +893,6 @@ function initInteractivePills() {
 
 // Clean and focused entrance animations
 function performEntranceAnimations() {
-  const rotationAngle1 = getCurrentHourAngleForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const clock2Timezone = CLOCK_CONFIG.clock2.useLocalTime ? null : CLOCK_CONFIG.clock2.timezone;
-  const rotationAngle2 = getCurrentHourAngleForTimezone(clock2Timezone);
-  const isDay1 = checkIsDayTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
-  const isDay2 = checkIsDayTimeForTimezone(clock2Timezone);
-
-  // Set initial states for both dials
-  if (dialRing1) {
-    dialRing1.style.transition = 'none';
-    dialRing1.style.transform = 'rotate(0deg)';
-  }
-
-  if (dialRing2) {
-    dialRing2.style.transition = 'none';
-    dialRing2.style.transform = 'rotate(0deg)';
-  }
-
-  if (dialMarker1) {
-    dialMarker1.style.transition = 'none';
-    dialMarker1.style.opacity = '0';
-    dialMarker1.style.transform = 'translate(-50%, -50%) scale(0)';
-  }
-
-  if (dialMarker2) {
-    dialMarker2.style.transition = 'none';
-    dialMarker2.style.opacity = '0';
-    dialMarker2.style.transform = 'translate(-50%, -50%) scale(0)';
-  }
-
-  // Set initial states for sun/moon icons
-  if (sunIcon1) {
-    sunIcon1.style.transition = 'none';
-    sunIcon1.style.opacity = '0';
-    sunIcon1.style.transform = `rotate(${isDay1 ? -120 : 0}deg)`;
-  }
-
-  if (moonIcon1) {
-    moonIcon1.style.transition = 'none';
-    moonIcon1.style.opacity = '0';
-    moonIcon1.style.transform = `rotate(${isDay1 ? 0 : 120}deg)`;
-  }
-
-  if (sunIcon2) {
-    sunIcon2.style.transition = 'none';
-    sunIcon2.style.opacity = '0';
-    sunIcon2.style.transform = `rotate(${isDay2 ? -120 : 0}deg)`;
-  }
-
-  if (moonIcon2) {
-    moonIcon2.style.transition = 'none';
-    moonIcon2.style.opacity = '0';
-    moonIcon2.style.transform = `rotate(${isDay2 ? 0 : 120}deg)`;
-  }
-
   // Set initial state for time displays
   if (clock1TimeElement) {
     const clock1TimeString = formatTimeForTimezone(CLOCK_CONFIG.clock1.timezone);
@@ -1025,33 +964,6 @@ function performEntranceAnimations() {
 
   // Start animations with updated timing
   requestAnimationFrame(() => {
-    // 1. Animate both dial rings
-    if (dialRing1) {
-      dialRing1.style.transition = 'transform 1.8s ease-out';
-      dialRing1.style.transform = `rotate(${rotationAngle1 + 360}deg)`;
-    }
-
-    if (dialRing2) {
-      dialRing2.style.transition = 'transform 1.8s ease-out';
-      dialRing2.style.transform = `rotate(${rotationAngle2 + 360}deg)`;
-    }
-
-    // 2. Fade in and rotate active icons for both dials
-    const activeIcon1 = isDay1 ? sunIcon1 : moonIcon1;
-    const activeIcon2 = isDay2 ? sunIcon2 : moonIcon2;
-
-    if (activeIcon1) {
-      activeIcon1.style.transition = 'opacity 1s ease, transform 1.2s ease';
-      activeIcon1.style.opacity = '1';
-      activeIcon1.style.transform = 'rotate(0deg)';
-    }
-
-    if (activeIcon2) {
-      activeIcon2.style.transition = 'opacity 1s ease, transform 1.2s ease';
-      activeIcon2.style.opacity = '1';
-      activeIcon2.style.transform = 'rotate(0deg)';
-    }
-
     // 4. Animate date elements - starts immediately with 120ms stagger
     if (dateElement) {
       dateElement.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
@@ -1090,21 +1002,6 @@ function performEntranceAnimations() {
         pill.style.transform = 'translateY(0)';
       }, index * 80); // Slight stagger
     });
-
-    // 6. Animate both marker dots - delayed start after 1200ms
-    setTimeout(() => {
-      if (dialMarker1) {
-        dialMarker1.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        dialMarker1.style.opacity = '1';
-        dialMarker1.style.transform = 'translate(-50%, -50%) scale(1)';
-      }
-
-      if (dialMarker2) {
-        dialMarker2.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
-        dialMarker2.style.opacity = '1';
-        dialMarker2.style.transform = 'translate(-50%, -50%) scale(1)';
-      }
-    }, 1200);
   });
 
   // Mark animation as complete after all animations have finished

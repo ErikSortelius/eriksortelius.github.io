@@ -112,13 +112,6 @@ body {
   border-top: 1px solid var(--border-color);
 }
 
-/* Center group for sun/moon dial and clocks */
-.center-group {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-}
-
 /* Clocks container for dual timezone display */
 .clocks-container {
   display: flex;
@@ -729,7 +722,6 @@ body {
 /* Non-interactive elements */
 .clock-container,
 .top-section,
-.center-group,
 .clock,
 .time,
 
