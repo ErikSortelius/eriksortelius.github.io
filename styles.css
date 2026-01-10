@@ -287,20 +287,20 @@ body {
 }
 
 .stock-symbol {
-  font-size: 1rem;
+  font-size: 1.1rem;
   font-weight: 600;
-  color: var(--text-color-dim);
+  color: var(--text-color);
 }
 
 .stock-price {
-  font-family: 'Inter', monospace;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-family: 'Inter', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .stock-pill .pill-label {
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 500;
 }
 
