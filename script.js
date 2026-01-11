@@ -4,6 +4,7 @@
 let initialAnimationComplete = false;
 let lastVocabIndex = -1;
 let lastGeoIndex = -1;
+let lastKnowledgeIndex = -1;
 
 // DOM elements
 const clock1TimeElement = document.getElementById('clock1Time');
@@ -867,9 +868,32 @@ function loadRandomGeography() {
   }
 }
 
+function loadRandomGeneralKnowledge() {
+  if (typeof GENERAL_KNOWLEDGE_QUESTIONS === 'undefined' || GENERAL_KNOWLEDGE_QUESTIONS.length === 0) return;
+
+  let randomIndex;
+  if (GENERAL_KNOWLEDGE_QUESTIONS.length > 1) {
+    do {
+      randomIndex = Math.floor(Math.random() * GENERAL_KNOWLEDGE_QUESTIONS.length);
+    } while (randomIndex === lastKnowledgeIndex);
+  } else {
+    randomIndex = 0;
+  }
+
+  lastKnowledgeIndex = randomIndex;
+  const data = GENERAL_KNOWLEDGE_QUESTIONS[randomIndex];
+
+  const questionEl = document.getElementById('knowledgeQuestion');
+  const answerEl = document.getElementById('knowledgeAnswer');
+
+  if (questionEl) questionEl.textContent = data.question;
+  if (answerEl) answerEl.textContent = data.answer;
+}
+
 function initInteractivePills() {
   // Initialize data
   loadRandomVocabulary();
+  loadRandomGeneralKnowledge();
   loadRandomGeography();
 
   // Vocabulary Pill Listener
@@ -884,6 +908,22 @@ function initInteractivePills() {
         }, 300);
       } else {
         // Reveal
+        this.classList.add('revealed');
+      }
+    });
+  }
+
+  // General Knowledge Pill Listener
+  const knowledgeWidget = document.getElementById('knowledgeWidget');
+  if (knowledgeWidget) {
+    knowledgeWidget.addEventListener('click', function () {
+      if (this.classList.contains('revealed')) {
+        // Link Mode: Go to Wikipedia
+        const answerText = document.getElementById('knowledgeAnswer').textContent;
+        const wikiUrl = `https://en.wikipedia.org/w/index.php?search=${encodeURIComponent(answerText)}`;
+        window.open(wikiUrl, '_blank');
+      } else {
+        // Reveal Mode
         this.classList.add('revealed');
       }
     });
