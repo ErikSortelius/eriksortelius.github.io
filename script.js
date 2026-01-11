@@ -37,17 +37,17 @@ function fetchStockData(forceRefresh = false) {
 
   // Use config symbol
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
-  const displayName = "GRANGEX"; // Fixed display name for UI
+  const displayName = "Grangex"; // Fixed display name for UI
 
   // Add click listener to refresh on the change element
   if (stockChangeElement) {
     stockChangeElement.onclick = (e) => {
       e.stopPropagation();
-      
+
       // Add a small rotation effect or loading indicator class
       stockChangeElement.style.opacity = '0.5';
       fetchStockData(true);
-      
+
       // Reset opacity after a short delay (updateStockUI will also handle this when data comes back)
       setTimeout(() => {
         stockChangeElement.style.opacity = '1';
