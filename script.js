@@ -40,28 +40,12 @@ function fetchStockData(forceRefresh = false) {
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
   const displayName = "Grangex"; // Fixed display name for UI
 
-  // Add click listener to refresh on the change element (idempotent assignment)
-  // if (stockChangeElement && !stockChangeElement.onclick) {
-  //   stockChangeElement.onclick = (e) => {
-  //     e.stopPropagation();
-  //     e.preventDefault();
-  //     fetchStockData(true);
-  //   };
-  // }
-
   // Check cache (unless forcing refresh)
   if (!forceRefresh) {
     const cachedStock = getCachedStockData();
     if (cachedStock) {
       updateStockUI(cachedStock);
       return;
-    }
-  } else {
-    // If forcing refresh, show loading state
-    if (stockChangeElement) {
-      // stockChangeElement.classList.add('loading');
-      // Three dots
-      // stockChangeElement.textContent = '• • •';
     }
   }
 
@@ -127,12 +111,12 @@ function updateStockUI(data) {
 
   const change = data.changePercent !== null ? data.changePercent : 0;
   const isPositive = change >= 0;
-  
+
   // Use geometric arrows for cleaner look
   const arrow = isPositive ? '▲' : '▼';
-  
+
   // Update text with arrow and absolute percentage
-  stockChangeElement.textContent = `${arrow} ${Math.abs(change).toFixed(2)}%`;
+  stockChangeElement.innerHTML = `<span class="trend-arrow">${arrow}</span> ${Math.abs(change).toFixed(2)}%`;
 
   // Remove old classes
   stockChangeElement.classList.remove('positive', 'negative');
@@ -146,7 +130,7 @@ function updateStockUI(data) {
   } else {
     stockChangeElement.classList.add('negative');
   }
-  
+
   // Add flash and pulse effect
   stockChangeElement.classList.add('flash');
 }

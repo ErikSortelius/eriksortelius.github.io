@@ -323,75 +323,57 @@ body {
   color: var(--text-color-dim);
   cursor: default;
   padding: 0.25rem 0.85rem;
-  border-radius: 9999px; /* Fully rounded pill shape */
+  border-radius: 9999px;
+  /* Fully rounded pill shape */
 
-  /* Container setup for gradient border */
-  position: relative;
-  background-color: var(--bg-color); /* Matches body background to hide the center of the gradient */
-  background-clip: padding-box; /* Ensures background doesn't bleed */
-  border: 2px solid transparent; /* Transparent border creates space for the gradient */
-  
+  /* Simple & Solid Design */
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+
   /* Layout */
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.35rem; /* Space for the arrow */
-  
+  gap: 0.35rem;
+  /* Space for the arrow */
+
   /* Transitions */
   transition: all 0.3s ease;
   user-select: none;
-  overflow: hidden; /* Clips the pseudo-element */
-  z-index: 1; /* Establishes stacking context */
 }
-
-/* The spinning gradient background */
-.stock-change::before {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: conic-gradient(
-    transparent, 
-    rgba(255, 255, 255, 0.3), 
-    transparent 30%
-  );
-  animation: rotate-border 4s linear infinite;
-  z-index: -1; /* Places it behind the content */
-}
-
-/* Inner masking to create the border effect */
-/* We simulate this by having the main element's background cover the center */
-/* The parent has bg-color and z-index 1, ::before has z-index -1 */
 
 .stock-change.positive {
   color: var(--green-300);
-}
-
-.stock-change.positive::before {
-  background: conic-gradient(
-    transparent 0deg,
-    transparent 20deg,
-    var(--green-300) 40deg,
-    transparent 80deg
-  );
+  background-color: rgba(134, 239, 172, 0.1);
+  border-color: rgba(134, 239, 172, 0.3);
+  box-shadow: 0 0 10px rgba(134, 239, 172, 0.05);
 }
 
 .stock-change.negative {
   color: var(--red-300);
+  background-color: rgba(252, 165, 165, 0.05);
+  border-color: rgba(252, 165, 165, 0.2);
 }
 
-.stock-change.negative::before {
-  /* Make the negative effect subtle: slower and dimmer */
-  opacity: 0.4; 
-  animation-duration: 8s; 
-  background: conic-gradient(
-    transparent 0deg,
-    transparent 20deg,
-    var(--red-300) 40deg,
-    transparent 80deg
-  );
+.trend-arrow {
+  display: inline-block;
+  animation: arrow-pulse 3s infinite ease-in-out;
+}
+
+@keyframes arrow-pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.9);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
 /* Subtle Flash effect for new data */
@@ -399,19 +381,14 @@ body {
   animation: flash-subtle 0.6s ease-out;
 }
 
-@keyframes rotate-border {
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
 @keyframes flash-subtle {
-  0% { 
-    filter: brightness(1.8);
+  0% {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
     transform: scale(1.02);
   }
-  100% { 
-    filter: brightness(1);
+
+  100% {
     transform: scale(1);
   }
 }
