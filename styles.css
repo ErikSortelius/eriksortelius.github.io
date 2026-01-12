@@ -319,19 +319,17 @@ body {
 
 .stock-change {
   font-size: 1.125rem;
-  /* Matches .weekday size */
   font-weight: 500;
   color: var(--text-color-dim);
-  cursor: pointer;
+  cursor: default;
   padding: 0.25rem 0.85rem;
-  border-radius: 9999px;
-  /* Fully rounded pill shape */
+  border-radius: 9999px; /* Fully rounded pill shape */
 
-  /* Glassmorphism base */
-  background-color: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
+  /* Container setup for gradient border */
+  position: relative;
+  background-color: var(--bg-color); /* Matches body background to hide the center of the gradient */
+  background-clip: padding-box; /* Ensures background doesn't bleed */
+  border: 2px solid transparent; /* Transparent border creates space for the gradient */
   
   /* Layout */
   display: inline-flex;
@@ -340,81 +338,82 @@ body {
   gap: 0.35rem; /* Space for the arrow */
   
   /* Transitions */
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.3s ease;
   user-select: none;
+  overflow: hidden; /* Clips the pseudo-element */
+  z-index: 1; /* Establishes stacking context */
 }
 
-.stock-change:hover {
-  border-color: var(--text-color);
-  background-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 0 12px rgba(255, 255, 255, 0.05);
-  transform: translateY(-1px);
+/* The spinning gradient background */
+.stock-change::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: conic-gradient(
+    transparent, 
+    rgba(255, 255, 255, 0.3), 
+    transparent 30%
+  );
+  animation: rotate-border 4s linear infinite;
+  z-index: -1; /* Places it behind the content */
 }
 
-.stock-change:active {
-  transform: scale(0.96) translateY(0);
-  filter: brightness(0.9);
-}
+/* Inner masking to create the border effect */
+/* We simulate this by having the main element's background cover the center */
+/* The parent has bg-color and z-index 1, ::before has z-index -1 */
 
 .stock-change.positive {
   color: var(--green-300);
-  background-color: rgba(134, 239, 172, 0.08); /* Green tint */
-  border-color: rgba(134, 239, 172, 0.3);
-  animation: pulse-green 4s infinite ease-in-out;
 }
 
-.stock-change.positive:hover {
-  background-color: rgba(134, 239, 172, 0.15);
-  border-color: var(--green-300);
-  box-shadow: 0 0 15px rgba(134, 239, 172, 0.2);
+.stock-change.positive::before {
+  background: conic-gradient(
+    transparent 0deg,
+    transparent 20deg,
+    var(--green-300) 40deg,
+    transparent 80deg
+  );
 }
 
 .stock-change.negative {
   color: var(--red-300);
-  background-color: rgba(252, 165, 165, 0.08); /* Red tint */
-  border-color: rgba(252, 165, 165, 0.3);
-  animation: pulse-red 4s infinite ease-in-out;
 }
 
-.stock-change.negative:hover {
-  background-color: rgba(252, 165, 165, 0.15);
-  border-color: var(--red-300);
-  box-shadow: 0 0 15px rgba(252, 165, 165, 0.2);
+.stock-change.negative::before {
+  /* Make the negative effect subtle: slower and dimmer */
+  opacity: 0.4; 
+  animation-duration: 8s; 
+  background: conic-gradient(
+    transparent 0deg,
+    transparent 20deg,
+    var(--red-300) 40deg,
+    transparent 80deg
+  );
 }
 
-/* Flash effect for new data */
+/* Subtle Flash effect for new data */
 .stock-change.flash {
-  animation: flash-bright 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  animation: flash-subtle 0.6s ease-out;
 }
 
-/* Loading state */
-.stock-change.loading {
-  color: var(--text-color-dim) !important;
-  background-color: rgba(255, 255, 255, 0.05) !important;
-  border-color: var(--border-color) !important;
-  animation: none !important;
-  cursor: wait;
-}
-
-@keyframes pulse-green {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(134, 239, 172, 0); }
-  50% { box-shadow: 0 0 10px 0 rgba(134, 239, 172, 0.15); }
-}
-
-@keyframes pulse-red {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(252, 165, 165, 0); }
-  50% { box-shadow: 0 0 10px 0 rgba(252, 165, 165, 0.15); }
-}
-
-@keyframes flash-bright {
-  0% { 
-    background-color: #fff; 
-    color: #000;
-    border-color: #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.6);
-    transform: scale(1.05);
+@keyframes rotate-border {
+  100% {
+    transform: rotate(360deg);
   }
-  100% { }
+}
+
+@keyframes flash-subtle {
+  0% { 
+    filter: brightness(1.8);
+    transform: scale(1.02);
+  }
+  100% { 
+    filter: brightness(1);
+    transform: scale(1);
+  }
 }
 
 /* Vocabulary/Geography Specifics */

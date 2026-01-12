@@ -41,13 +41,13 @@ function fetchStockData(forceRefresh = false) {
   const displayName = "Grangex"; // Fixed display name for UI
 
   // Add click listener to refresh on the change element (idempotent assignment)
-  if (stockChangeElement && !stockChangeElement.onclick) {
-    stockChangeElement.onclick = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-      fetchStockData(true);
-    };
-  }
+  // if (stockChangeElement && !stockChangeElement.onclick) {
+  //   stockChangeElement.onclick = (e) => {
+  //     e.stopPropagation();
+  //     e.preventDefault();
+  //     fetchStockData(true);
+  //   };
+  // }
 
   // Check cache (unless forcing refresh)
   if (!forceRefresh) {
@@ -59,9 +59,9 @@ function fetchStockData(forceRefresh = false) {
   } else {
     // If forcing refresh, show loading state
     if (stockChangeElement) {
-      stockChangeElement.classList.add('loading');
+      // stockChangeElement.classList.add('loading');
       // Three dots
-      stockChangeElement.textContent = '• • •';
+      // stockChangeElement.textContent = '• • •';
     }
   }
 
@@ -69,6 +69,7 @@ function fetchStockData(forceRefresh = false) {
   // We use query1.finance.yahoo.com/v8/finance/chart/SYMBOL
   const proxyUrl = 'https://corsproxy.io/?';
   const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
+
 
   console.log(`📈 Fetching stock data for ${symbol} via proxy...`);
 
