@@ -40,19 +40,12 @@ function fetchStockData(forceRefresh = false) {
   const symbol = STOCK_CONFIG.symbol || 'GRANGX.ST';
   const displayName = "Grangex"; // Fixed display name for UI
 
-  // Add click listener to refresh on the change element
-  if (stockChangeElement) {
+  // Add click listener to refresh on the change element (idempotent assignment)
+  if (stockChangeElement && !stockChangeElement.onclick) {
     stockChangeElement.onclick = (e) => {
       e.stopPropagation();
-
-      // Add a small rotation effect or loading indicator class
-      stockChangeElement.style.opacity = '0.5';
+      e.preventDefault();
       fetchStockData(true);
-
-      // Reset opacity after a short delay (updateStockUI will also handle this when data comes back)
-      setTimeout(() => {
-        stockChangeElement.style.opacity = '1';
-      }, 500);
     };
   }
 
@@ -62,6 +55,13 @@ function fetchStockData(forceRefresh = false) {
     if (cachedStock) {
       updateStockUI(cachedStock);
       return;
+    }
+  } else {
+    // If forcing refresh, show loading state
+    if (stockChangeElement) {
+      stockChangeElement.classList.add('loading');
+      // Three dots
+      stockChangeElement.textContent = '• • •';
     }
   }
 
@@ -108,34 +108,46 @@ function fetchStockData(forceRefresh = false) {
       console.error('Stock fetch failed:', err);
       // Fallback UI or stay hidden
       if (stockPriceElement) stockPriceElement.textContent = '--.--';
-      if (stockChangeElement) stockChangeElement.textContent = '--%';
+      if (stockChangeElement) {
+        stockChangeElement.classList.remove('loading');
+        stockChangeElement.textContent = '--%';
+      }
     });
 }
 
 function updateStockUI(data) {
   if (!stockSymbolElement || !stockPriceElement || !stockChangeElement) return;
 
+  // Remove loading state
+  stockChangeElement.classList.remove('loading');
+
   stockSymbolElement.textContent = data.symbol;
   stockPriceElement.textContent = typeof data.price === 'number' ? data.price.toFixed(2) : '--.--';
 
   const change = data.changePercent !== null ? data.changePercent : 0;
-  const sign = change >= 0 ? '+' : '';
-  stockChangeElement.textContent = `${sign}${change.toFixed(2)}%`;
+  const isPositive = change >= 0;
+  
+  // Use geometric arrows for cleaner look
+  const arrow = isPositive ? '▲' : '▼';
+  
+  // Update text with arrow and absolute percentage
+  stockChangeElement.textContent = `${arrow} ${Math.abs(change).toFixed(2)}%`;
 
-  // Update classes for color
+  // Remove old classes
   stockChangeElement.classList.remove('positive', 'negative');
-  // Also update parent widget wrapper if it exists (stockWidget is defined at global scope)
-  // if (stockWidget) {
-  //   stockWidget.classList.remove('positive', 'negative');
-  // }
+  stockChangeElement.classList.remove('flash');
 
-  if (change >= 0) {
+  // Trigger reflow for animation restart
+  void stockChangeElement.offsetWidth;
+
+  if (isPositive) {
     stockChangeElement.classList.add('positive');
-    // if (stockWidget) stockWidget.classList.add('positive');
   } else {
     stockChangeElement.classList.add('negative');
-    // if (stockWidget) stockWidget.classList.add('negative');
   }
+  
+  // Add flash and pulse effect
+  stockChangeElement.classList.add('flash');
 }
 
 function cacheStockData(data) {
