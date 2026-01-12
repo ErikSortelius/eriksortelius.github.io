@@ -250,6 +250,12 @@ body {
   user-select: none;
 }
 
+.blur-content.is-always-visible {
+  filter: none;
+  opacity: 1;
+  user-select: auto;
+}
+
 .revealed .pill-label {
   filter: blur(0);
   opacity: 1;
@@ -377,29 +383,21 @@ body {
   max-width: 95%; /* Prevent edge touching */
 }
 
-/* Knowledge Pill - Link State */
-.knowledge-pill.revealed {
-  border-color: var(--green-300);
-  cursor: alias !important; /* Force alias/pointer cursor to show interactivity */
+/* Knowledge Pill - Not Clickable */
+.knowledge-pill {
+  cursor: default;
 }
 
-.knowledge-pill.revealed::after {
-  content: '↗';
-  position: absolute;
-  top: 0.5rem;
-  right: 0.75rem;
-  font-size: 1.2rem;
-  color: var(--green-300);
-  opacity: 0;
-  animation: fadeIconIn 0.5s 0.2s forwards; /* Delay slightly to match reveal */
+.knowledge-pill:hover {
+  /* Remove hover effects for non-interactive pill */
+  box-shadow: var(--neumorphic-shadow-subtle);
+  border-color: var(--border-color);
 }
 
-@keyframes fadeIconIn {
-  from { opacity: 0; transform: translate(-2px, 2px); }
-  to { opacity: 1; transform: translate(0, 0); }
+.knowledge-pill:hover::before {
+  /* No hover tint */
+  background-color: transparent !important;
 }
-
-
 
 /* Date info */
 .date-info {

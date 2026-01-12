@@ -914,6 +914,12 @@ function initInteractivePills() {
   }
 
   // General Knowledge Pill Listener
+  /* 
+   * The General Knowledge pill is read-only (not clickable).
+   * It displays a question and reveals the answer automatically or stays static as per design.
+   * If interactivity is needed later, uncomment below.
+   */
+  /*
   const knowledgeWidget = document.getElementById('knowledgeWidget');
   if (knowledgeWidget) {
     knowledgeWidget.addEventListener('click', function () {
@@ -928,6 +934,7 @@ function initInteractivePills() {
       }
     });
   }
+  */
 
   // Geography Pill Listener
   const geoWidget = document.getElementById('geoWidget');
