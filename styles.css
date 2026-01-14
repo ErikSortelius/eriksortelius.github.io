@@ -348,7 +348,6 @@ body {
   color: var(--green-300);
   background-color: rgba(134, 239, 172, 0.1);
   border-color: rgba(134, 239, 172, 0.3);
-  box-shadow: 0 0 10px rgba(134, 239, 172, 0.05);
 }
 
 .stock-change.negative {
@@ -359,7 +358,16 @@ body {
 
 .trend-arrow {
   display: inline-block;
-  animation: arrow-pulse 3s infinite ease-in-out;
+}
+
+/* Energized pulse for positive trend */
+.stock-change.positive .trend-arrow {
+  animation: arrow-pulse 1.5s infinite ease-in-out;
+}
+
+/* Slower pulse for negative trend */
+.stock-change.negative .trend-arrow {
+  animation: arrow-pulse 4s infinite ease-in-out;
 }
 
 @keyframes arrow-pulse {
