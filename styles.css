@@ -318,10 +318,17 @@ body {
 }
 
 .stock-change {
+  /* Button Reset */
+  appearance: none;
+  -webkit-appearance: none;
+  font-family: inherit;
+  outline: none;
+  margin: 0;
+  
   font-size: 1.125rem;
   font-weight: 500;
   color: var(--text-color-dim);
-  cursor: pointer;
+  cursor: default; /* As requested */
   padding: 0.25rem 0.85rem;
   border-radius: 9999px;
   /* Fully rounded pill shape */

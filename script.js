@@ -33,8 +33,8 @@ const feelsLikeElement = document.getElementById('feelsLike');
 const weatherConditionElement = document.getElementById('weatherCondition');
 
 // Stock State
-let currentStockPeriod = '1Day';
-const STOCK_PERIODS = ['1Day', '1Month', '1Year', 'Total'];
+let currentStockPeriod = 'Today';
+const STOCK_PERIODS = ['Today', 'Total'];
 let fullStockData = null; // Store fetched data for calculations
 
 // Stock functions
@@ -55,10 +55,10 @@ function fetchStockData(forceRefresh = false) {
     }
   }
 
-  // CORS Proxy logic to fetch 1 Year of daily data
-  // We use range=1y to enable 1Day, 1Month, 1Year calculations
+  // CORS Proxy logic to fetch simplified Yahoo Finance Data
+  // We use range=1d for Today's data
   const proxyUrl = 'https://corsproxy.io/?';
-  const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1y`;
+  const targetUrl = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=1d`;
 
 
   console.log(`📈 Fetching stock data for ${symbol} via proxy...`);
@@ -73,20 +73,13 @@ function fetchStockData(forceRefresh = false) {
       try {
         const result = data.chart.result[0];
         const meta = result.meta;
-        const indicators = result.indicators.quote[0];
-        const timestamps = result.timestamp;
-        
         const currentPrice = meta.regularMarketPrice;
-        
+
         // Construct a richer data object
         const stockData = {
           symbol: displayName,
           price: currentPrice || 0,
-          originalMeta: meta, // contains previousClose
-          history: {
-            timestamps: timestamps,
-            closes: indicators.close
-          },
+          originalMeta: meta, // contains regularMarketOpen, previousClose
           timestamp: Date.now()
         };
 
@@ -112,50 +105,17 @@ function calculateChangeForPeriod(data, period) {
   const currentPrice = data.price;
   let comparisonPrice = data.price; // Default to no change
 
-  if (period === '1Day') {
-    // Attempt to find the most recent "closed" day from history
-    // meta.previousClose is usually reliable for "yesterday's close" even in range queries,
-    // whereas chartPreviousClose is often the close of the starting period of the chart.
-    if (data.originalMeta.previousClose) {
-        comparisonPrice = data.originalMeta.previousClose;
-    } else {
-        // Fallback: look at history
-        const history = data.history;
-        if (history && history.closes && history.closes.length > 1) {
-            // Use the second to last item as a proxy for yesterday if regular market price is live
-            // detailed timestamp checks would be better but this is a reasonable approximation
-            comparisonPrice = history.closes[history.closes.length - 2];
-        }
+  if (period === 'Today') {
+    // "Since Opening Today" logic
+    // We prioritize regularMarketOpen.
+    // If unavailable, we fall back to previousClose (standard daily change).
+    if (data.originalMeta && data.originalMeta.regularMarketOpen) {
+      comparisonPrice = data.originalMeta.regularMarketOpen;
+    } else if (data.originalMeta && data.originalMeta.previousClose) {
+      comparisonPrice = data.originalMeta.previousClose;
     }
   } else if (period === 'Total') {
     comparisonPrice = STOCK_CONFIG.purchasePrice || 49.17;
-  } else {
-    // For Month and Year, we look back in the history array
-    const history = data.history;
-    if (history && history.timestamps && history.closes) {
-        const now = Date.now() / 1000;
-        let targetTime = 0;
-        
-        if (period === '1Month') targetTime = now - (30 * 24 * 60 * 60);
-        if (period === '1Year') targetTime = now - (365 * 24 * 60 * 60);
-
-        // Find the closest timestamp that is <= targetTime
-        // Timestamps are sorted ascending
-        let closestIndex = 0;
-        
-        // Simple search for nearest date
-        for (let i = 0; i < history.timestamps.length; i++) {
-           if (history.timestamps[i] >= targetTime) {
-             closestIndex = i;
-             break;
-           }
-        }
-        
-        // If we found a valid historical point
-        if (closestIndex >= 0 && history.closes[closestIndex]) {
-            comparisonPrice = history.closes[closestIndex];
-        }
-    }
   }
 
   // Calculate percentage
@@ -167,15 +127,15 @@ function calculateChangeForPeriod(data, period) {
 }
 
 function cycleStockPeriod(e) {
-    if(e) e.stopPropagation(); // Prevent refresh if clicking the pill
-    
-    const currentIndex = STOCK_PERIODS.indexOf(currentStockPeriod);
-    const nextIndex = (currentIndex + 1) % STOCK_PERIODS.length;
-    currentStockPeriod = STOCK_PERIODS[nextIndex];
-    
-    if (fullStockData) {
-        updateStockUI(fullStockData);
-    }
+  if (e) e.stopPropagation(); // Prevent refresh if clicking the pill
+
+  const currentIndex = STOCK_PERIODS.indexOf(currentStockPeriod);
+  const nextIndex = (currentIndex + 1) % STOCK_PERIODS.length;
+  currentStockPeriod = STOCK_PERIODS[nextIndex];
+
+  if (fullStockData) {
+    updateStockUI(fullStockData);
+  }
 }
 
 function updateStockUI(data) {
@@ -1161,21 +1121,9 @@ function init() {
   // Initialize Interactive Pills
   initInteractivePills();
 
-  // Add event listener to stock widget for manual refresh (Only if clicking outside the change pill)
-  if (stockWidget) {
-    stockWidget.addEventListener('click', (e) => {
-       // If the click is on the stockChange element or its children, do not refresh, let it bubble or be handled
-       if (e.target.closest('#stockChange')) return;
-
-      // Visual feedback
-      if (stockPriceElement) stockPriceElement.textContent = '...';
-      fetchStockData(true);
-    });
-  }
-  
   // Add listener for period toggle
   if (stockChangeElement) {
-      stockChangeElement.addEventListener('click', cycleStockPeriod);
+    stockChangeElement.addEventListener('click', cycleStockPeriod);
   }
 
   // Perform entrance animations last, based on available data
