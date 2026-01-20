@@ -106,13 +106,19 @@ function calculateChangeForPeriod(data, period) {
   let comparisonPrice = data.price; // Default to no change
 
   if (period === 'Today') {
-    // "Since Opening Today" logic
-    // We prioritize regularMarketOpen.
-    // If unavailable, we fall back to previousClose (standard daily change).
-    if (data.originalMeta && data.originalMeta.regularMarketOpen) {
-      comparisonPrice = data.originalMeta.regularMarketOpen;
-    } else if (data.originalMeta && data.originalMeta.previousClose) {
-      comparisonPrice = data.originalMeta.previousClose;
+    // Priority 1: chartPreviousClose (The closing price of the previous trading session)
+    // In the provided JSON, this is 48.7, while current is 51.6. This gives the correct daily change.
+    if (data.originalMeta && typeof data.originalMeta.chartPreviousClose === 'number') {
+        comparisonPrice = data.originalMeta.chartPreviousClose;
+    }
+    // Priority 2: regularMarketOpen (Price at open today)
+    // In the JSON: 48.2999...
+    else if (data.originalMeta && data.originalMeta.regularMarketOpen) {
+        comparisonPrice = data.originalMeta.regularMarketOpen;
+    }
+    // Priority 3: previousClose (Standard field)
+    else if (data.originalMeta && data.originalMeta.previousClose) {
+        comparisonPrice = data.originalMeta.previousClose;
     }
   } else if (period === 'Total') {
     comparisonPrice = STOCK_CONFIG.purchasePrice || 49.17;
