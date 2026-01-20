@@ -286,8 +286,7 @@ body {
   justify-content: center;
   flex: 1;
   padding: 0 1rem;
-  pointer-events: auto; /* Enable clicks */
-  cursor: pointer; /* Indicate refresh interaction */
+  /* Pointer events removed from container to disable full widget click */
 }
 
 .stock-main {
@@ -361,7 +360,7 @@ body {
 .stock-change.negative:hover {
   background-color: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.4);
-  transform: translateY(-1px);
+  /* transform removed to prevent movement */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
