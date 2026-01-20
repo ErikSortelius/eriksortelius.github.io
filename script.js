@@ -113,8 +113,20 @@ function calculateChangeForPeriod(data, period) {
   let comparisonPrice = data.price; // Default to no change
 
   if (period === '1Day') {
-    // meta.chartPreviousClose is the closing price of the previous trading day
-    comparisonPrice = data.originalMeta.chartPreviousClose || data.originalMeta.previousClose;
+    // Attempt to find the most recent "closed" day from history
+    // meta.previousClose is usually reliable for "yesterday's close" even in range queries,
+    // whereas chartPreviousClose is often the close of the starting period of the chart.
+    if (data.originalMeta.previousClose) {
+        comparisonPrice = data.originalMeta.previousClose;
+    } else {
+        // Fallback: look at history
+        const history = data.history;
+        if (history && history.closes && history.closes.length > 1) {
+            // Use the second to last item as a proxy for yesterday if regular market price is live
+            // detailed timestamp checks would be better but this is a reasonable approximation
+            comparisonPrice = history.closes[history.closes.length - 2];
+        }
+    }
   } else if (period === 'Total') {
     comparisonPrice = STOCK_CONFIG.purchasePrice || 49.17;
   } else {
