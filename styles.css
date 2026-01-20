@@ -286,6 +286,8 @@ body {
   justify-content: center;
   flex: 1;
   padding: 0 1rem;
+  pointer-events: auto; /* Enable clicks */
+  cursor: pointer; /* Indicate refresh interaction */
 }
 
 .stock-main {
@@ -329,6 +331,7 @@ body {
   font-weight: 500;
   color: var(--text-color-dim);
   cursor: default; /* As requested */
+  pointer-events: auto; /* Enable clicks */
   padding: 0.25rem 0.85rem;
   border-radius: 9999px;
   /* Fully rounded pill shape */
