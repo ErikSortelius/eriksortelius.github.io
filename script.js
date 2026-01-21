@@ -106,19 +106,15 @@ function calculateChangeForPeriod(data, period) {
   let comparisonPrice = data.price; // Default to no change
 
   if (period === 'Today') {
-    // Priority 1: chartPreviousClose (The closing price of the previous trading session)
-    // In the provided JSON, this is 48.7, while current is 51.6. This gives the correct daily change.
+
     if (data.originalMeta && typeof data.originalMeta.chartPreviousClose === 'number') {
-        comparisonPrice = data.originalMeta.chartPreviousClose;
+      comparisonPrice = data.originalMeta.chartPreviousClose;
     }
-    // Priority 2: regularMarketOpen (Price at open today)
-    // In the JSON: 48.2999...
     else if (data.originalMeta && data.originalMeta.regularMarketOpen) {
-        comparisonPrice = data.originalMeta.regularMarketOpen;
+      comparisonPrice = data.originalMeta.regularMarketOpen;
     }
-    // Priority 3: previousClose (Standard field)
     else if (data.originalMeta && data.originalMeta.previousClose) {
-        comparisonPrice = data.originalMeta.previousClose;
+      comparisonPrice = data.originalMeta.previousClose;
     }
   } else if (period === 'Total') {
     comparisonPrice = STOCK_CONFIG.purchasePrice || 49.17;
@@ -133,7 +129,7 @@ function calculateChangeForPeriod(data, period) {
 }
 
 function cycleStockPeriod(e) {
-  if (e) e.stopPropagation(); // Prevent refresh if clicking the pill
+  if (e) e.stopPropagation();
 
   const currentIndex = STOCK_PERIODS.indexOf(currentStockPeriod);
   const nextIndex = (currentIndex + 1) % STOCK_PERIODS.length;
@@ -147,27 +143,18 @@ function cycleStockPeriod(e) {
 function updateStockUI(data) {
   if (!stockSymbolElement || !stockPriceElement || !stockChangeElement) return;
 
-  // Remove loading state
   stockChangeElement.classList.remove('loading');
-
   stockSymbolElement.textContent = data.symbol;
   stockPriceElement.textContent = typeof data.price === 'number' ? data.price.toFixed(2) : '--.--';
 
-  // Calculate change based on current period
   const changePercent = calculateChangeForPeriod(data, currentStockPeriod);
   const isPositive = changePercent >= 0;
-
-  // Use geometric arrows for cleaner look
   const arrow = isPositive ? '▲' : '▼';
 
-  // Update text with arrow and absolute percentage
   stockChangeElement.innerHTML = `${currentStockPeriod} ${Math.abs(changePercent).toFixed(2)}% <span class="trend-arrow">${arrow}</span>`;
-
-  // Remove old classes
   stockChangeElement.classList.remove('positive', 'negative');
   stockChangeElement.classList.remove('flash');
 
-  // Trigger reflow for animation restart
   void stockChangeElement.offsetWidth;
 
   if (isPositive) {
@@ -176,7 +163,6 @@ function updateStockUI(data) {
     stockChangeElement.classList.add('negative');
   }
 
-  // Add flash and pulse effect
   stockChangeElement.classList.add('flash');
 }
 
